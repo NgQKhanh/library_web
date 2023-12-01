@@ -1,0 +1,28 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "intelligent library automation",
+  "main": "server.js",
+  "scripts": {
+    "test": " ",
+    "start": "nodemon ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NgQKhanh/learn_nodejs.git"
+  },
+  "keywords": [
+    "library"
+  ],
+  "author": "Nguyen Quoc Khanh",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "3.1.8",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "3.0.1"
+  }
+}
