@@ -3,33 +3,23 @@ const app = express();
 const port = 3000;
 const path = require('path');
 const webRoutes = require('./routes/web');
-const mysql = require('mysql2');
+const connection = require('./models/database');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
-//config template engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine','ejs');
 
-//config static file
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname,'public')));
+app.use(session({
+  secret: 'your_secret_key',
+  resave: true,
+  saveUninitialized: true,
+}))
 
-// route declare
 app.use('/',webRoutes);
-
-// create the connection to database
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  database: 'library'
-});
-
-// simple query
-connection.query(
-  'SELECT * FROM `users` WHERE userID = 1',
-  function(err, results, fields) {
-    console.log(results); // results contains rows returned by server
-    console.log(fields); // fields contains extra meta data about results, if available
-  }
-);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
