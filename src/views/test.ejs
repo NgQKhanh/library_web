@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>test socket</title>
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+  <ul id="messages"></ul>
+  <form id="form" action="">
+    <input id="m" autocomplete="off" /><button>Send</button>
+  </form>
+
+  <script>
+    const socket = io();
+
+    // Xử lý sự kiện khi server gửi tin nhắn đến client
+    socket.on('mes', (msg) => {
+      const ul = document.getElementById('messages');
+      const li = document.createElement('li');
+      li.appendChild(document.createTextNode(msg));
+      ul.appendChild(li);
+    });
+
+    // Xử lý sự kiện khi form được submit
+    document.getElementById('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('m');
+      const message = input.value;
+      // Gửi tin nhắn lên server
+      socket.emit('mes', message);
+      input.value = '';
+      return false;
+    });
+  </script>
+</body>
+</html>

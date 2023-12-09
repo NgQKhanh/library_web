@@ -6,8 +6,10 @@ const RFIDLoginController = require('../controllers/RFIDLoginController');
 
 router.get('/home', authMiddleware.loggedin, controller.getHomePage);
 
-router.get('/login', authMiddleware.isAuth, RFIDLoginController.login);
-router.post('/login', RFIDLoginController.authenticate);
-router.post('/logout', RFIDLoginController.logout);
+router.get('/RFIDLogin', authMiddleware.isAuth, RFIDLoginController.login);
+router.post('/RFIDLogin', RFIDLoginController.authenticate);
+router.post('/RFIDLogout', RFIDLoginController.logout);
+
+router.get('/test',RFIDLoginController.test);
 
 module.exports = router;

@@ -3,7 +3,7 @@ exports.loggedin = (req, res, next) => {
         res.locals.user = req.session.user;
         next();
     } else {
-        res.redirect('/login')
+        res.redirect('/RFIDLogin')
     }
 }
 

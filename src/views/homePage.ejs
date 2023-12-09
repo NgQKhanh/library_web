@@ -19,15 +19,15 @@
         <ol>
           <% borrowedBooks.forEach(book => { %>
             <li>
-              <p>Book ID: <%= book.bookID %></p>
+              <p><%= book.bookname %></p>
             </li>
           <% }); %>
         </ol>
     <% } else { %>
-        <p>Bạn đang không mượn quyển sách nào</p>
+        <p>Bạn đang không mượn quyển sách nào!</p>
     <% } %>
 
-    <form action="/logout" method="post">
+    <form action="/RFIDLogout" method="post">
         <button type="submit">Logout</button>
     </form>
 </body>

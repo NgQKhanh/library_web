@@ -1,27 +1,27 @@
 
 const sql = require('./database');
 
-const User = function(user){
-    this.id = user.id;
-    this.username = user.username;
+const Book = function(book){
+  this.bookname = book.bookname;
 };
 
-User.findByUserID = (id, result) => {
-  sql.query("SELECT * from `users` WHERE userID = ?",id,(err, res) => {
-      if (err) {
-          result(err, null);
-          return;
-      }
-      if (res.length) {
-        const user = new User({
-            id: res[0].userID, 
-            username: res[0].hoTen, 
-          });
-          result(null, user)
-          return;
-      }
-      result(null, null);
-  });
+async function borrowedBook (userID)
+{
+  try{
+    const [rows, fields] = await sql.execute("SELECT books.tenSach FROM `loan` JOIN `books` ON loan.bookID = books.bookID WHERE loan.userID = ?",[userID])
+      if(!rows.length) return [];
+      else{
+          const books = rows.map(item => new Book({
+            bookname: item.tenSach,
+          }));
+            return books;
+        }
+  }catch (error) {
+    console.error("Error in borrowedBook:", error);
+    throw new Error("Error fetching borrowed book");
+  }
 }
 
-module.exports = User;
+module.exports = {
+  borrowedBook,
+}

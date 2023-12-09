@@ -1,42 +1,54 @@
 // userController.js
 
-const userModel = require('../models/userModel');
+const userModel = require('../models/loginModel');
 
-function login (req, res){
-  res.render('login');
+//Hiển thị trang đăng nhập
+function login (req, res)
+{
+  res.render('RFIDLogin');
 }
 
-function authenticate (req, res){
+// Xử lý yêu cầu đăng nhập
+async function authenticate (req, res){
+  
     const { id } = req.body;
 
-    userModel.findByUserID(id, (err, user) => {
-      if (err) 
-      {
-        const message = 'Đã có lỗi xảy ra!';
-        res.render('login',{message});
-      } 
-      else if(!user){
-        const message =  'Người dùng chưa đăng ký!';
-        res.render('login',{message});
+    try{
+      // Tìm id người dùng trong danh sách
+      const user = await userModel.findByUserID(id);
+      if(!user){
+        res.status(404).json({ success: false, message: 'Người dùng chưa đăng ký!' });
       }
       else {
         req.session.loggedin = true;
         req.session.user = user;
-        res.redirect('home');
+        res.json({ success: true, message: 'Đăng nhập thành công', redirectTo: '/home' });
       }
-    });
+    }
+    catch(error){
+      console.error("Error in findByUserID:", error);
+      res.status(500).json({ success: false, message: 'Lỗi server, vui lòng thử lại sau.' });
+    }
 }
 
+// Đăng xuất
 function logout (req, res) {
   req.session.destroy((err) => {
     if (err) console.log("Lỗi");
-    res.redirect('login');
+    res.redirect('RFIDLogin');
 })
+}
+
+
+function test (req, res)
+{
+  res.render('test');
 }
 
 module.exports = {
   login,
   authenticate,
   logout,
+  test,
 }
 
