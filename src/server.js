@@ -1,9 +1,8 @@
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const path = require('path');
 const webRoutes = require('./routes/web');
-const APIRoute = require('./routes/api');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const server = require('http').createServer(app);
@@ -25,7 +24,6 @@ app.use(session({
 socketIOManager.sendID(app, io);
 
 app.use('/',webRoutes);
-app.use('/api',APIRoute);
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

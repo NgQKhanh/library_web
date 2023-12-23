@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/style.css"> 
+    <title>Trang người dùng</title>
+</head>
+<body>
+    <h1 id="title">Đây là trang người dùng</h1>
+
+    <div class="container">
+      <!-- Thông tin người dùng ---------------------------------------------------------------->
+      <div class="user-info" id="user">
+        <p>Họ tên: <%= user.username %></p>
+        
+        <!-- Hiển thị sách đang mượn -->
+        <% if (borrowedBooks.length > 0) { %>
+            <p>Sách đang mượn:</p>
+            <ol>
+              <% borrowedBooks.forEach(book => { %>
+                <li>
+                  <p><%= book.bookname %></p>
+                </li>
+              <% }); %>
+            </ol>
+        <% } else { %>
+            <p>Bạn đang không mượn quyển sách nào!</p>
+        <% } %>
+
+        <!-- Hiển thị thông tin đăng ký phòng đọc -->
+        <% if (1) { %> 
+          <% for (let i = 0; i < readingRoom.reg.length; i++) { %>
+          <p>Thời gian đăng ký phòng đọc: <%= new Date(readingRoom.reg[i].date).toLocaleDateString() %> 
+            Kíp: <%= readingRoom.reg[i].shift %></p>
+            <% } %>
+        <% } else { %>
+            <p>Bạn chưa đăng ký phòng đọc!</p>
+        <% } %>
+        
+        <form action="/delReg" method="post">
+          <button class="bt3" type="submit">Hủy đăng ký</button>
+        </form>
+
+        <!-- Đăng xuất -->
+        <br><form action="/logout" method="post">
+          <button type="submit" class="bt">Đăng xuất</button>
+        </form>
+      </div>
+
+      <!-- Đăng ký --------------------------------------------------------------------------->
+      <div class="service" id="user">
+        <!-- Bảng thông tin đăng ký phòng đọc -->
+        <p>Bảng thông tin đăng ký phòng đọc</p>
+        <table>
+          <thead>
+              <tr>
+                  <th>Ngày</th>
+                  <th>Buổi sáng</th>
+                  <th>Buổi chiều</th>
+              </tr>
+          </thead>
+          <tbody>
+              <% for (let i = 0; i < regInfo.length; i++) { %>
+                  <tr>
+                      <td><%= new Date(regInfo[i].date).toLocaleDateString() %></td>
+                      <td><%= regInfo[i].shift_1 %>/5</td>
+                      <td><%= regInfo[i].shift_2 %>/5</td>
+                  </tr>
+              <% } %>
+          </tbody>
+        </table>
+    
+        <!-- Form đăng ký phòng đọc -->
+        <p>Đăng ký phòng đọc</p>
+        <form action="/userPage" method="post">
+          <label for="selectedDate">Chọn ngày:</label>
+          <input type="date" id="selectedDate" name="date" required><br>
+
+          <label for="selectedShift">Chọn kíp:</label>
+          <select id="selectedShift" name="shift" required>
+              <option value="1">Buổi sáng</option>
+              <option value="2">Buổi chiều</option>
+          </select><br><br>
+
+          <button class="bt2" type="submit">Đăng ký</button>
+        </form>
+      </div>
+    </div>
+</body>
+</html>

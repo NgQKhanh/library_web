@@ -1,51 +1,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <title>Đăng nhập</title>
+    <link rel="stylesheet" href="css/style.css"> 
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 </head>
   <body>
-      <h1>Trang đăng nhập</h1>
-      <!-- <form action="/RFIDLogin" method="post">
-        <label for="username">ID:</label>
-        <input type="text" id="username" name="id" required>
-        <br>
-        <button type="submit">Login</button>
-      </form> 
-      <div id="message"></div> -->
-
+    <div id="title"><br><br><h1>Quẹt thẻ để đăng nhập</h1></div>
+      
       <script>
         const socket = io();
 
-        socket.on('userID', async (msg) => {
+        socket.on('ID', async (msg) => {
           try {
+            /* Gửi yêu cầu tìm ID người dùng */
             const response = await fetch('/RFIDLogin', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: msg }),
-            });
+              });
 
-            if (response.ok) {
+            if (response.ok) 
+            {
+              /* ID hợp lệ => chuyển hướng trang */
               window.location.href = '/home';
-            } else {
-              // không tìm thấy người dùng
+            } 
+            else
+            {
+              /* không tìm thấy người dùng */
               const responseData = await response.json();
               console.error('Error:', responseData.message);
               alert(`Error: ${responseData.message}`);
             }
-          } catch (error) {
-            // Lỗi hệ thống
+          } 
+          catch (error) 
+          {
+            /* Lỗi hệ thống */
             console.error('Fetch error:', error);
             alert('An error occurred. Please try again.');
           }
       });
-
     </script>
-          <!-- <% if (typeof message != "undefined" && message) { %>
-            <div class="text-danger text-left  mb-3"><%= message %></div>
-        <% } %> -->
   </body>
 </html>

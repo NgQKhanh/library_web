@@ -1,21 +1,19 @@
-// userController.js
 
 const userModel = require('../models/loginModel');
 
-//Hiển thị trang đăng nhập
+/* Hiển thị trang đăng nhập ----------------------------------*/
 function login (req, res)
 {
   res.render('RFIDLogin');
 }
 
-// Xử lý yêu cầu đăng nhập
+/* Xử lý yêu cầu đăng nhập ------------------------------------*/
 async function authenticate (req, res){
   
-    const { id } = req.body;
-
+    const id = req.body;
     try{
-      // Tìm id người dùng trong danh sách
-      const user = await userModel.findByUserID(id);
+      /*  Tìm id người dùng trong danh sách */
+      const user = await userModel.findByUserID(id.id);
       if(!user){
         res.status(404).json({ success: false, message: 'Người dùng chưa đăng ký!' });
       }
@@ -31,24 +29,18 @@ async function authenticate (req, res){
     }
 }
 
-// Đăng xuất
+/* Đăng xuất ----------------------------------------------------*/
 function logout (req, res) {
-  req.session.destroy((err) => {
-    if (err) console.log("Lỗi");
-    res.redirect('RFIDLogin');
-})
-}
-
-
-function test (req, res)
-{
-  res.render('test');
+  if (req.session.user) {
+    delete req.session.user;
+    delete req.session.loggedin;
+  }
+  res.redirect('/RFIDLogin');
 }
 
 module.exports = {
   login,
   authenticate,
   logout,
-  test,
 }
 

@@ -1,21 +1,11 @@
-// http://localhost:3000/sendUserID
-// http://localhost:3000/sendBookID
+// http://localhost:3000/sendID
 
 function sendID(app, io) {
 
-  //----- Gửi ID người dùng ---------
-  app.post('/sendUserID', (req, res) => {
+  //--------- Gửi ID từ RFID reader ---------
+  app.post('/sendID', (req, res) => {
     const data = req.body.id;   
-    io.emit('userID', data);
-  
-    res.json({ success: true, message: 'Message sent to Socket.IO' });
-  });
-  
-  //-------- Gửi ID book ---------
-  app.post('/sendBookID', (req, res) => {
-    const data = req.body.id;   
-    io.emit('bookID', data);  
-
+    io.emit('ID', data);
     res.json({ success: true, message: 'Message sent to Socket.IO' });
   });
 }

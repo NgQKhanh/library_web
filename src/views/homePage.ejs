@@ -1,34 +1,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thư viện tự động</title>
+    <link rel="stylesheet" href="css/style.css"> 
+    <script src="js/socket.io.min.js"></script>
+    <script src="js/jquery-3.6.4.min.js"></script>
+
 </head>
-<body>
+  <body>
     <div class="topnav">
-      <a class="active" href="#home">Home</a>
+      <a class="active" href="#home" id="home">Home</a>
       <a href="#news">News</a>
       <a href="#contact">Contact</a>
       <a href="#about">About</a>
     </div>
-    <h1>Đây là trang chủ</h1>
-    <p>Họ tên: <%= user.username %></p>
-    
-    <% if (borrowedBooks.length > 0) { %>
-        <p>Sách đang mượn:</p>
-        <ol>
-          <% borrowedBooks.forEach(book => { %>
-            <li>
-              <p><%= book.bookname %></p>
-            </li>
-          <% }); %>
-        </ol>
-    <% } else { %>
-        <p>Bạn đang không mượn quyển sách nào!</p>
-    <% } %>
 
-    <form action="/RFIDLogout" method="post">
-        <button type="submit">Logout</button>
-    </form>
-</body>
+    <div id="title"><h1>THƯ VIỆN TỰ ĐỘNG</h1></div>
+
+    <div class="container">
+      <div class="user-info" id="user">
+        <p>Họ tên: <%= user.username %></p>
+        
+        <!-- Hiển thị sách đang mượn -->
+        <% if (borrowedBooks.length > 0) { %>
+            <p>Sách đang mượn:</p>
+            <ol>
+              <% borrowedBooks.forEach(book => { %>
+                <li>
+                  <p><%= book.bookname %></p>
+                </li>
+              <% }); %>
+            </ol>
+        <% } else { %>
+            <p>Bạn đang không mượn quyển sách nào!</p>
+        <% } %>
+
+        <!-- Hiển thị thông tin phòng đọc -->
+        <p>Số người đang sử dụng phòng đọc tự do: <%= readingRoom.userNumber %> /5</p>
+
+        <!-- Hiển thị thông tin đăng ký phòng đọc -->
+        <% if (1) { %> 
+          <% for (let i = 0; i < readingRoom.reg.length; i++) { %>
+          <p>Thời gian đăng ký phòng đọc: <%= new Date(readingRoom.reg[i].date).toLocaleDateString() %> 
+            Kíp: <%= readingRoom.reg[i].shift %></p>
+            <% } %>
+        <% } else { %>
+            <p>Bạn chưa đăng ký phòng đọc!</p>
+        <% } %>
+        
+        </body>
+      <form action="/RFIDLogout" method="post">
+          <button type="submit" class="bt2">Đăng xuất</button>
+      </form>
+    </div>
+
+    <div class="service">
+      <div class="button-container">
+          <a href="#" onclick="loadPage('borrowBook')"><button class="bt">Mượn sách</button></a>
+          <a href="#" onclick="loadPage('returnBook')"><button class="bt">Trả sách</button></a>
+      </div>
+      <div id="content-container">
+          <!-- CONTENT WILL BE LOADED HERE -->
+      </div>
+    </div>
+
+    <script>
+      async function handleClick() {
+        location.reload();
+      }
+      home.addEventListener('click', handleClick);
+
+      const socket = io();
+      let borrowBookList = [];
+      let returnBookList = [];
+      let bookIDList = [];
+
+      /* hiển thị layout mượn/trả sách */
+      function loadPage(pageLayout) {
+        borrowBookList = [];
+        returnBookList = [];
+
+          $.ajax({
+              url: `/load-page?page_layout=${pageLayout}`,
+              method: 'GET',
+              success: function (data) {
+                  $('#content-container').html(data);
+              },
+              error: function (error) {
+                  console.error('AJAX error:', error);
+              }
+          });
+        }
+    </script>
+
+     </div>
+  </body>
 </html>
