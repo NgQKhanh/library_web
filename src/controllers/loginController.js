@@ -1,11 +1,11 @@
 
 const Model = require('../models/loginModel');
 
-/* Hiển thị trang đăng nhập ----------------------------------*/
-function login (req, res)
-{
-  res.render('login');
-}
+const authRes = function(auth){
+  this.status = auth.status,
+  this.userID = auth.userID;
+  this.username = auth.username;
+};
 
 /* Xử lý yêu cầu đăng nhập ------------------------------------*/
 async function authenticate (req, res){
@@ -14,13 +14,22 @@ async function authenticate (req, res){
     try{
       /*  Xác nhận tên đăng nhập/mật khẩu */
        const auth = await Model.auth(user);
-       if(!auth){
-         res.send('Sai tên đăng nhập hoặc mật khẩu');
+
+       if(!auth){ // Đăng nhập thành công
+        const aRes = new authRes({
+          status: false, 
+          userID: null, 
+          username: null,
+        });
+         res.send(aRes);
        }
-      else {
-        req.session.userLoggedin = true;
-        req.session.userInfo = auth;
-        res.redirect('/userPage');
+      else { //Đăng nhập không thành công
+        const aRes = new authRes({
+          status: true, 
+          userID: auth.id, 
+          username: auth.username,
+        });
+         res.send(aRes);
       }
     }
     catch(error){
@@ -39,7 +48,6 @@ function logout (req, res) {
 }
 
 module.exports = {
-  login,
   authenticate,
   logout,
 }

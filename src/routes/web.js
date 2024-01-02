@@ -23,10 +23,8 @@ router.post('/confirmReturn', controller.confirmReturn);
 router.post('/bookName',controller.getBookName);
 
 /* Người dùng đăng nhập */
-router.get('/login',authMiddleware.isUserAuth, loginController.login);
 router.post('/login',loginController.authenticate);
-router.post('/logout', loginController.logout);
-router.get('/userPage', authMiddleware.userLoggedin, userPageController.getUserPage);
+router.post('/userPage', userPageController.getInfo);
 
 /* Đăng ký phòng đọc */
 router.post('/userPage', userPageController.confirmRegister);

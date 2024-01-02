@@ -9,8 +9,8 @@ let getHomePage = async (req, res) =>
   try
   {
     /* Lấy thông tin người dùng, thông tin phòng đọc */
-    const borrowedBooks = await model.borrowedBookList(user.id);
-    const readingRoom = await model.readingRoomInfo(user.id);
+    const borrowedBooks = await model.getBorrowedBookList(user.id);
+    const readingRoom = await model.getReadingRoomInfo(user.id);
 
     res.render('homePage.ejs', { user , borrowedBooks, readingRoom });
   } 

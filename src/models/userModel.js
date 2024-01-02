@@ -11,7 +11,7 @@ const Reg = function(regInfo){
 }
 
 /*Lấy list sách đang mượn -------------- */
-async function borrowedBookList (userID)
+async function getBorrowedBookList (userID)
 {
   try{
     const [rows] = await sql.execute(
@@ -21,9 +21,7 @@ async function borrowedBookList (userID)
 
       if(!rows.length) return [];
       else{
-          const books = rows.map(item => new Book({
-            bookname: item.tenSach,
-          }));
+          const books = rows.map(item => item.tenSach);
             return books;
         }
   }
@@ -36,7 +34,7 @@ async function borrowedBookList (userID)
 
 
 /*lấy thông tin phòng đọc -------------- */
-async function readingRoomInfo(userID) {
+async function getReadingRoomInfo(userID) {
   try {
 
     /*Cập nhật ngày tháng đến hiện tại */
@@ -127,7 +125,7 @@ async function returnUpdate(userID, bookIDs){
 }
 
 /* Lấy thông tin đăng ký phòng đọc --------------- */
-async function regInfo(){
+async function getRegInfo(){
   try 
   {
     /* Cập nhật ngày tháng đến hiện tại */
@@ -178,12 +176,15 @@ async function regDelete(user){
 }
 
 module.exports = {
-  borrowedBookList,
-  readingRoomInfo,
+  getBorrowedBookList,
+  getReadingRoomInfo,
+  getRegInfo,
+
   findByBookID,
+
   borrowUpdate,
   returnUpdate,
-  regInfo,
+
   regConfirm,
   regDelete,
 }

@@ -1,25 +1,35 @@
 const model = require('../models/userModel');
-const { use } = require('../routes/web');
 
-/* Hiển thị trang người dùng */
-let getUserPage = async (req, res) =>
-{
-  const user = req.session.userInfo;
+const Info = function(info){
+  this.borrowedBookList = info.borrowedBookList,
+  this.readingRoomInfo = info.readingRoomInfo;
+  this.regInfo = info.regInfo;
+};
+
+/* Lấy thông tin người dùng/thông tin phòng đọc */
+async function getInfo(req,res){
+  const UID = req.body.userID;
+
   try
   {
-    /* Lấy thông tin người dùng, thông tin đăng ký */
-    const borrowedBooks = await model.borrowedBookList(user.id);
-    const readingRoom = await model.readingRoomInfo(user.id);
+    const borrowedBooks = await model.getBorrowedBookList(UID);
+    const readingRoom = await model.getReadingRoomInfo(UID);
+    const regInfo = await model.getRegInfo();
+    
+    const info = new Info({
+        borrowedBookList: borrowedBooks,
+        //readingRoomInfo: readingRoom,
+        //regInfo: regInfo,
+      })
+    res.send(info);
 
-    const regInfo = await model.regInfo();
-
-    res.render('userPage.ejs', { user , borrowedBooks, readingRoom, regInfo });
   } 
   catch(error)
   {
     console.error("Error in borrowed book:", error);
     res.status(500).send("Đã có lỗi xảy ra!");
   }
+
 }
 
 /* Xác nhận đăng ký phòng đọc */
@@ -54,7 +64,7 @@ async function deleteRegister (req,res){
 }
 
 module.exports = {
-    getUserPage,
     confirmRegister,
     deleteRegister,
+    getInfo,
 }
