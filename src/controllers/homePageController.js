@@ -1,18 +1,21 @@
+
 // http://localhost:3000/sendID
 
-const model = require('../models/userModel');
+const model = require('../models/Model');
 
-/* Hiển thị trang chủ */
+/* Hiển thị trang chủ ---------------------------------------------------*/
 let getHomePage = async (req, res) =>
 {
   const user = req.session.user;
   try
   {
     /* Lấy thông tin người dùng, thông tin phòng đọc */
-    const borrowedBooks = await model.getBorrowedBookList(user.id);
-    const readingRoom = await model.getReadingRoomInfo(user.id);
+    const borrowedBooks = await model.user_BorrowedBookList(user.id);
+    const readingRoom = await model.ReadingRoomInfo();
+    const reservation = await model.ReservationInfo();
+    console.log(reservation);
 
-    res.render('homePage.ejs', { user , borrowedBooks, readingRoom });
+    res.render('homePage.ejs', { user , borrowedBooks, readingRoom, reservation});
   } 
   catch(error)
   {
@@ -21,14 +24,14 @@ let getHomePage = async (req, res) =>
   }
 }
 
-/* Hiển thị mượn/trả sách */
+/* Hiển thị mượn/trả sách ----------------------------------------------------*/
 function layout (req, res) 
 {
   const pageLayout = req.query.page_layout;
   res.render(pageLayout);
 };
 
-/* Tìm tên sách */
+/* Tìm tên sách -------------------------------------------------------------*/
 async function getBookName (req, res)
 {
   const { bookID } = req.body;
@@ -45,7 +48,7 @@ async function getBookName (req, res)
   }
 }
 
-/* Xác nhận mượn sách */
+/* Xác nhận mượn sách -------------------------------------------------------- */
 async function confirmBorrow (req,res){
   try {
     const user = req.session.user;
@@ -53,8 +56,8 @@ async function confirmBorrow (req,res){
 
     console.log('Received borrowBookList:', bookIDList);
 
-    await model.borrowUpdate(user.id, bookIDList);
-    // Phản hồi về client
+    await model.user_BorrowUpdate(user.id, bookIDList);
+
     res.status(200).json({ message: 'Borrow confirmed successfully.' });
   } catch (error) {
     console.error('Error:', error);
@@ -62,7 +65,7 @@ async function confirmBorrow (req,res){
   }
 }
 
-/* Xác nhận trả sách */
+/* Xác nhận trả sách --------------------------------------------------------- */
 async function confirmReturn (req,res){
   try {
     const user = req.session.user;
@@ -70,8 +73,8 @@ async function confirmReturn (req,res){
 
     console.log('Received returnBookList:', bookIDList);
 
-    await model.returnUpdate(user.id, bookIDList);
-    // Phản hồi về client
+    await model.user_ReturnUpdate(user.id, bookIDList);
+
     res.status(200).json({ message: 'Borrow confirmed successfully.' });
   } catch (error) {
     console.error('Error:', error);

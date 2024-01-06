@@ -7,7 +7,7 @@ const authRes = function(auth){
   this.username = auth.username;
 };
 
-/* Xử lý yêu cầu đăng nhập ------------------------------------*/
+/* Xử lý yêu cầu đăng nhập app ------------------------------------*/
 async function authenticate (req, res){
   
     const user = req.body;
@@ -15,7 +15,7 @@ async function authenticate (req, res){
       /*  Xác nhận tên đăng nhập/mật khẩu */
        const auth = await Model.auth(user);
 
-       if(!auth){ // Đăng nhập thành công
+       if(!auth){ // Đăng không nhập thành công
         const aRes = new authRes({
           status: false, 
           userID: null, 
@@ -23,7 +23,7 @@ async function authenticate (req, res){
         });
          res.send(aRes);
        }
-      else { //Đăng nhập không thành công
+      else { //Đăng nhập thành công
         const aRes = new authRes({
           status: true, 
           userID: auth.id, 
@@ -38,17 +38,7 @@ async function authenticate (req, res){
     }
 }
 
-/* Đăng xuất ----------------------------------------------------*/
-function logout (req, res) {
-  if (req.session.userInfo) {
-    delete req.session.userInfo;
-    delete req.session.userLoggedin;
-  }
-  res.redirect('/login');
-}
-
 module.exports = {
   authenticate,
-  logout,
 }
 

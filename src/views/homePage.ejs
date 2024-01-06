@@ -27,7 +27,7 @@
             <ol>
               <% borrowedBooks.forEach(book => { %>
                 <li>
-                  <p><%= book.bookname %></p>
+                  <p><%= book %></p>
                 </li>
               <% }); %>
             </ol>
@@ -39,14 +39,15 @@
         <p>Số người đang sử dụng phòng đọc tự do: <%= readingRoom.userNumber %> /5</p>
 
         <!-- Hiển thị thông tin đăng ký phòng đọc -->
-        <% if (1) { %> 
-          <% for (let i = 0; i < readingRoom.reg.length; i++) { %>
-          <p>Thời gian đăng ký phòng đọc: <%= new Date(readingRoom.reg[i].date).toLocaleDateString() %> 
-            Kíp: <%= readingRoom.reg[i].shift %></p>
+        <% if (reservation.length) { %> 
+          <% for (let i = 0; i < reservation.length; i++) { %>
+          <p>Thời gian đăng ký phòng đọc: <%= new Date(reservation[i].date).toLocaleDateString() %> 
+            Kíp: <%= reservation[i].shift %></p>
             <% } %>
         <% } else { %>
             <p>Bạn chưa đăng ký phòng đọc!</p>
         <% } %>
+
         
         </body>
       <form action="/RFIDLogout" method="post">

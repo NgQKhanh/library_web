@@ -1,8 +1,10 @@
 
+// http://localhost:3000/sendID
+
 const userModel = require('../models/loginModel');
 
 /* Hiển thị trang đăng nhập ----------------------------------*/
-function login (req, res)
+function getLoginPage (req, res)
 {
   res.render('RFIDLogin');
 }
@@ -39,7 +41,7 @@ function logout (req, res) {
 }
 
 module.exports = {
-  login,
+  getLoginPage,
   authenticate,
   logout,
 }

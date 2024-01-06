@@ -1,19 +1,16 @@
 
 const sql = require('./database');
 
-const Book = function(book){
-  this.bookname = book.bookname;
-};
-
-const Reg = function(regInfo){
-  this.date = regInfo.date;
-  this.shift = regInfo.shift;
+const Rsvn = function(rsvnInfo){
+  this.date = rsvnInfo.date;
+  this.shift = rsvnInfo.shift;
 }
 
-/*Lấy list sách đang mượn -------------- */
-async function getBorrowedBookList (userID)
+/*Lấy list sách đang mượn ------------------------------------------------ */
+async function BorrowedBookList (req, res)
 {
   try{
+    const userID = req.body.userID;
     const [rows] = await sql.execute(
       "SELECT books.tenSach FROM `loan` "+ 
       "JOIN `books` ON loan.bookID = books.bookID " +
@@ -22,7 +19,7 @@ async function getBorrowedBookList (userID)
       if(!rows.length) return [];
       else{
           const books = rows.map(item => item.tenSach);
-            return books;
+            res.send(books);
         }
   }
   catch (error) 
@@ -32,40 +29,14 @@ async function getBorrowedBookList (userID)
   }
 }
 
-
-/*lấy thông tin phòng đọc -------------- */
-async function getReadingRoomInfo(userID) {
+/* Lấy thông tin phòng đọc ----------------------------------------------- */
+async function ReadingRoomInfo(req,res) {
   try {
-
-    /*Cập nhật ngày tháng đến hiện tại */
-    const currentDate = new Date().toISOString().slice(0, 10);
-    /* 
-      Kiểm tra xem người dùng đã checkin phòng đọc chưa
-      Kiểm tra số người trong phòng đọc tự do
-      Lấy thông tin đăng ký
-    */
-    const [isCheckin] = await sql.execute("SELECT * FROM `reading room` WHERE userID = ?",[userID]);
+    /* Kiểm tra số người trong phòng đọc tự do */
     const [userNumber] = await sql.execute("SELECT * FROM `reading room` WHERE 1");
-    const [regInfo] = await sql.execute(`SELECT * FROM \`registered room\` WHERE userID = '${userID}' AND date >= '${currentDate}'`);
-    // console.log(isCheckin.length)
-    // console.log(regInfo);
-
-    let reg;
-    if(!regInfo.length) reg = [];
-    else
-    {
-      reg = regInfo.map(item => new Reg({
-        date: item.date,
-        shift: item.shift,
-      }));
-    }
-    //console.log(reg)
-
-    return {
-      isCheckin: isCheckin.length,
+    res.send( {
       userNumber: userNumber.length,
-      reg: reg,
-    };
+    });
   } 
   catch (error) 
   {
@@ -74,58 +45,8 @@ async function getReadingRoomInfo(userID) {
   }
 }
 
-/* Tìm tên sách bằng ID ---------------------*/
-async function findByBookID (bookId)
-{
-  try{
-    const [rows] = await sql.execute("SELECT * from `books` WHERE bookID = ?",[bookId]);
-    if(!rows.length) return null;
-    else{
-      const book = new Book({
-        bookname: rows[0].tenSach, 
-      });
-    return book;
-    }
-  }catch (error) {
-      console.error("Error in findByBookID:", error);
-      throw new Error("Error fetching book by ID");
-  }
-}
-
-/* Cập nhật list sách mượn -------------- */
-async function borrowUpdate(userID, bookIDs){
-  try 
-  {
-    const borrowData = bookIDs.map(bookId => `('${userID}','${bookId}')`).join(',');
-    const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
-
-    await sql.execute(`INSERT INTO \`loan\`(\`userID\`, \`bookID\`) VALUES ${borrowData}`);
-    await sql.execute(`UPDATE \`books\` SET \`status\`='1' WHERE \`bookID\` IN (${status})`);
-  } 
-  catch (error) 
-  {
-    throw new Error("Error");
-  }
-}
-
-/* Cập nhật trả sách -------------- */
-async function returnUpdate(userID, bookIDs){
-  try 
-  {
-    const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
-    const returnData = bookIDs.map(bookId => `bookID = '${bookId}'`).join(' OR ');
-
-    await sql.execute(`DELETE FROM \`loan\` WHERE userID = '${userID}' AND ${returnData}`);
-    await sql.execute(`UPDATE \`books\` SET \`status\`='0' WHERE \`bookID\` IN (${status})`);
-  } 
-  catch (error) 
-  {
-    console.error('Error:', error);
-  }
-}
-
-/* Lấy thông tin đăng ký phòng đọc --------------- */
-async function getRegInfo(){
+/* Lấy thông tin đăng ký phòng đọc ------------------------------------------ */
+async function RsvnInfo(req,res){
   try 
   {
     /* Cập nhật ngày tháng đến hiện tại */
@@ -140,7 +61,7 @@ async function getRegInfo(){
       "GROUP BY date",
       [currentDate]
       );
-    return(result)
+    res.send(result)
   } 
   catch (error) 
   {
@@ -148,8 +69,8 @@ async function getRegInfo(){
   }
 }
 
-/* Xác nhận đăng ký phòng đọc --------------- */
-async function regConfirm(user, reg){
+/* Xác nhận đăng ký phòng đọc --------------------------------------------- */
+async function rsvnConfirm(user, res){
   try 
   {
     await sql.execute
@@ -163,8 +84,8 @@ async function regConfirm(user, reg){
   }
 }
 
-/* Hủy đăng ký phòng đọc --------------- */
-async function regDelete(user){
+/* Hủy đăng ký phòng đọc ------------------------------------------------ */
+async function rsvnDelete(user){
   try 
   {
     await sql.execute("DELETE FROM `registered room` WHERE userID = ?", [user.id]);
@@ -176,15 +97,10 @@ async function regDelete(user){
 }
 
 module.exports = {
-  getBorrowedBookList,
-  getReadingRoomInfo,
-  getRegInfo,
+  BorrowedBookList,
+  ReadingRoomInfo,
+  RsvnInfo,
 
-  findByBookID,
-
-  borrowUpdate,
-  returnUpdate,
-
-  regConfirm,
-  regDelete,
+  rsvnConfirm,
+  rsvnDelete,
 }
