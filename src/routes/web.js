@@ -21,4 +21,10 @@ router.post('/confirmReturn', homePage.confirmReturn);
 /* Tìm tên sách */
 router.post('/bookName',homePage.getBookName);
 
+/* Tra cứu tài liệu */
+router.get('/search',homePage.search)
+
+/* test GET API*/
+router.post('/test', homePage.test);
+
 module.exports = router;

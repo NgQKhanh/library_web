@@ -26,10 +26,10 @@ async function ReservationInfo(req,res){
     const currentDate = new Date().toISOString().slice(0, 10);
     /* Thông tin ngày, kíp đăng ký */
     const [result] = await sql.execute
-    ( "SELECT date," +
-      "COUNT(CASE WHEN shift = 1 THEN 1 END) AS shift_1,"+
-      "COUNT(CASE WHEN shift = 2 THEN 1 END) AS shift_2" +
-      " FROM \`registered room\` "+
+    ( "SELECT date, " +
+      "COUNT(CASE WHEN shift = 1 THEN 1 END) AS shift_1, "+
+      "COUNT(CASE WHEN shift = 2 THEN 1 END) AS shift_2 " +
+      "FROM `reservation` "+
       "WHERE date > ? " +  
       "GROUP BY date",
       [currentDate]
@@ -49,7 +49,7 @@ async function findByBookID (bookId)
     const [rows] = await sql.execute("SELECT * from `books` WHERE bookID = ?",[bookId]);
     if(!rows.length) return null;
     else{
-      return({bookname: rows[0].tenSach});
+      return({bookname: rows[0].bookName});
 
     }
   }catch (error) {
@@ -63,7 +63,7 @@ async function findByBookID (bookId)
  */
   
 /* Người dùng (userID) xác nhận MƯỢN sách --------------------------------------------------- */
-async function user_BorrowUpdate(userID, bookIDs){
+async function user_BorrowConfirm(userID, bookIDs){
   try 
   { // Ngày mượn sách, cập nhật trạng thái đang mượn (status = 1)
     const currentDate = new Date().toISOString().slice(0, 10);
@@ -80,7 +80,7 @@ async function user_BorrowUpdate(userID, bookIDs){
 }
 
 /* Người dùng (userID) xác nhận TRẢ sách ------------------------------------------------------ */
-async function user_ReturnUpdate(userID, bookIDs){
+async function user_ReturnConfirm(userID, bookIDs){
   try 
   {
     const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
@@ -99,11 +99,14 @@ async function user_ReturnUpdate(userID, bookIDs){
 async function user_ReservationInfo(userID) {
   try {
 
-    /* Cập nhật ngày tháng đến hiện tại */
-    const currentDate = new Date().toISOString().slice(0, 10);
-    /* Lấy thông tin đặt chỗ*/
-    const [rsvnInfo] = await sql.execute(`SELECT * FROM \`registered room\` WHERE userID = '${userID}' AND date >= '${currentDate}'`);
+    /* Cập nhật ngày tháng */
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowString = tomorrow.toISOString().split('T')[0];
 
+    /* Lấy thông tin đặt chỗ*/
+    const [rsvnInfo] = await sql.execute(`SELECT * FROM \`reservation\` WHERE userID = '${userID}' AND date >= '${tomorrowString}'`);
+    
     let rsvn;
     if(!rsvnInfo.length) rsvn = [];
     else
@@ -113,7 +116,7 @@ async function user_ReservationInfo(userID) {
         shift: item.shift,
       }));
     } 
-    return {rsvn: rsvn};
+    return {rsvn};
   } 
   catch (error) 
   {
@@ -123,14 +126,14 @@ async function user_ReservationInfo(userID) {
 }
 
 /* Người dùng (userID) xác nhận ĐẶT chỗ phòng đọc ---------------------------------------------- */
-async function user_ReservationConfirm(userID, rsvn){
+async function user_ReservationConfirm(userID, date, shift){
   try 
   {
 
     await sql.execute
-      (`INSERT INTO \`registered room\` ` +
+      (`INSERT INTO \`reservation\` ` +
        `(\`userID\`, \`date\`, \`shift\`) VALUES ` +
-       `('${userID}', '${rsvn.date}', ${rsvn.shift});`);
+       `('${userID}', '${date}', ${shift});`);
   } 
   catch (error) 
   {
@@ -142,7 +145,7 @@ async function user_ReservationConfirm(userID, rsvn){
 async function user_ReservationDelete(userID){
   try 
   {
-    await sql.execute("DELETE FROM `registered room` WHERE userID = ?", [userID]);
+    await sql.execute("DELETE FROM `reservation` WHERE userID = ?", [userID]);
   } 
   catch (error) 
   {
@@ -154,14 +157,21 @@ async function user_ReservationDelete(userID){
 async function user_BorrowedBookList (userID)
 {
   try{
+    //Thời hạn mượn
+    let dueDays = process.env.DUE_DAYS;
+
     const [rows] = await sql.execute(
-      "SELECT books.tenSach FROM `loan` "+ 
+      "SELECT books.bookName, loan.borrowDate, DATE_ADD(loan.borrowDate, INTERVAL ? DAY) AS dueDate FROM `loan` "+ 
       "JOIN `books` ON loan.bookID = books.bookID " +
-      "WHERE loan.userID = ?",[userID]);
+      "WHERE loan.userID = ?",[dueDays, userID]);
 
       if(!rows.length) return [];
       else{
-          const books = rows.map(item => item.tenSach);
+          const books = rows.map(item => ({
+            bookName: item.bookName,
+            borrowDate: item.borrowDate,
+            dueDate: item.dueDate
+          }));
             return books;
         }
   }
@@ -178,8 +188,8 @@ module.exports = {
   findByBookID,
 
   user_BorrowedBookList,
-  user_BorrowUpdate,
-  user_ReturnUpdate,
+  user_BorrowConfirm,
+  user_ReturnConfirm,
   user_ReservationConfirm,
   user_ReservationDelete,
   user_ReservationInfo

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const dotenv = require('dotenv').config({path: __dirname + '/config.env'});
+const PORT = process.env.PORT || 3000;
 const path = require('path');
 const webRoutes = require('./routes/web');
 const appRoutes = require('./routes/app');

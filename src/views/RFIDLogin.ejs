@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="css/style.css"> 
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="js/socket.io.min.js"></script>
 </head>
   <body>
     <div id="title"><br><br><h1>Quẹt thẻ để đăng nhập</h1></div>
@@ -27,7 +27,7 @@
             } 
             else
             {
-              /* không tìm thấy người dùng */
+              /* Không tìm thấy người dùng */
               const responseData = await response.json();
               console.error('Error:', responseData.message);
               alert(`Error: ${responseData.message}`);

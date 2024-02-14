@@ -23,17 +23,28 @@
         
         <!-- Hiển thị sách đang mượn -->
         <% if (borrowedBooks.length > 0) { %>
-            <p>Sách đang mượn:</p>
-            <ol>
+          <p>Bảng thông tin sách mượn: </p>
+          <table>
+            <thead>
+                <tr>
+                    <th>Tên sách</th>
+                    <th>Ngày mượn</th>
+                    <th>Hạn trả</th>
+                </tr>
+            </thead>
+            <tbody>
               <% borrowedBooks.forEach(book => { %>
-                <li>
-                  <p><%= book %></p>
-                </li>
-              <% }); %>
-            </ol>
+                    <tr>
+                        <td><%= book.bookName %></td>                     
+                        <td><%= new Date(book.borrowDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }) %></td>
+                        <td><%= new Date(book.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }) %></td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+          </table>
         <% } else { %>
             <p>Bạn đang không mượn quyển sách nào!</p>
-        <% } %>
+        <% } %>        
 
         <!-- Hiển thị thông tin phòng đọc -->
         <p>Số người đang sử dụng phòng đọc tự do: <%= readingRoom.userNumber %> /5</p>
@@ -59,6 +70,7 @@
       <div class="button-container">
           <a href="#" onclick="loadPage('borrowBook')"><button class="bt">Mượn sách</button></a>
           <a href="#" onclick="loadPage('returnBook')"><button class="bt">Trả sách</button></a>
+          <a href="#" onclick="loadPage('search')"><button class="bt">Tra cứu</button></a>
       </div>
       <div id="content-container">
           <!-- CONTENT WILL BE LOADED HERE -->

@@ -1,0 +1,52 @@
+
+<h2>Tra cứu tài liệu </h2>
+
+<div id="searchContainer">
+    <form id="searchForm" action="/search" method="GET">
+        <input type="text" name="query" placeholder="Nhập từ khóa">
+        <button type="submit">Search</button>
+    </form>
+    <div id="searchResults">
+        <!-- Search results will be displayed here -->
+    </div>
+</div>
+
+<script>
+    // public/app.js
+document.getElementById('searchForm').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the form from submitting in the traditional way
+
+    const query = document.querySelector('input[name="query"]').value;
+    const resultsContainer = document.getElementById('searchResults');
+
+    try {
+        // Perform an asynchronous fetch to the server
+        const response = await fetch(`/search?query=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        // Check if the response was successful (status code in the range 200-299)
+        if (response.ok) {
+            const results = await response.json();
+
+            // Update the DOM with search results
+            if (results.length > 0) {
+                resultsContainer.innerHTML = `<h3>Kết quả tìm kiếm:</h3><ul>${results.map(result => `<li>${result}</li>`).join('')}</ul>`;
+            } else {
+                resultsContainer.innerHTML = '<p>Không tìm thấy kết quả.</p>';
+            }
+        } else {
+            console.error('Error:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+});
+
+</script>
+
+
+

@@ -1,13 +1,12 @@
 
-require ('dotenv').config();
 const mysql = require('mysql2/promise'); 
 
 // Create a pool of database connections
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '130401',
-  database: 'library',
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE,
   // host: 'library-ahtkhanh-0b08.a.aivencloud.com',
   // user: 'avnadmin',
   // password: 'AVNS_ccZgH2sTOD1RrwlIa0D',

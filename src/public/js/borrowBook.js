@@ -16,7 +16,6 @@ try {
         /* Lấy dữ liệu từ response */
         const bookData = await response.json();
         const bookName = bookData.bookname;
-        //console.log(bookName);
 
         /* Hiển thị danh sách sách muốn mượn */
         bookIDList.push(msg);

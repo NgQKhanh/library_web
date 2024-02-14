@@ -1,29 +1,14 @@
 const model = require('../models/Model');
 
-const Info = function(info){
-  this.borrowedBookList = info.borrowedBookList,
-  this.readingRoomInfo = info.readingRoomInfo;
-  this.regInfo = info.regInfo;
-};
-
-const BBList = function(list){
-  this.borrowedBookList = list.borrowedBookList;
-};
-
-const RRoom = function(room){
-  this.borrowedBookList = list.borrowedBookList;
-};
-
 /* Lấy danh sách sách mượn -----------------------------------------------------------------*/
 async function getBorrowedBookList(req,res){
-  const UID = req.body.userID; // Lấy ID người dùng gửi lên
+  // Lấy ID người dùng gửi lên
+  const userID = req.body.userID; 
   try
   {
-    const borrowedBooks = await model.BorrowedBookList(UID);    // Lấy list sách mượn từ db
-    const list = new BBList({
-        borrowedBookList: borrowedBooks,
-      })
-    res.send(list); // Trả về list sách mượn
+    // Lấy list sách mượn từ db
+    const borrowedBooks = await model.user_BorrowedBookList(userID); 
+    res.send({ borrowedBookList: borrowedBooks}); 
   } 
   catch(error)
   {
@@ -36,14 +21,9 @@ async function getBorrowedBookList(req,res){
 async function getReadingRoomInfo(req,res){
   const UID = req.body.userID;
   try
-  {
+  { //Lấy thông tin phòng đọc từ db
     const readingRoom = await model.ReadingRoomInfo(UID); 
-    const info = new Info({
-        borrowedBookList: borrowedBooks,
-        //readingRoomInfo: readingRoom,
-        //regInfo: regInfo,
-      })
-    res.send(info);
+    res.send({ readingRoom: readingRoom});
   } 
   catch(error)
   {
@@ -53,17 +33,50 @@ async function getReadingRoomInfo(req,res){
 }
 
 /* Lấy thông tin đặt chỗ -----------------------------------------------------------------*/
-async function getInfo(req,res){
-  const UID = req.body.userID;
+async function getRsvnInfo(req,res){
+  const userID = req.body.userID;
   try
-  {
-    const readingRoom = await model.ReadingRoomInfo(UID); 
-    const info = new Info({
-        borrowedBookList: borrowedBooks,
-        //readingRoomInfo: readingRoom,
-        //regInfo: regInfo,
-      })
-    res.send(info);
+  { //Lấy thông tin đặt chỗ từ db
+    const reservationInfo = await model.ReservationInfo();
+    const userReservation = await model.user_ReservationInfo(userID); 
+
+    const maxDay = process.env.MAX_DAY_RSVN;
+    const currentDate = new Date();
+    let j = 0;
+    const dateArray = [];
+    const shift1Array = [];
+    const shift2Array = [];
+
+    for (let i = 0; i <= maxDay; i++) {
+      const tagretDate = new Date();
+      tagretDate.setDate(currentDate.getDate() + i);
+      dateArray[i] = tagretDate;
+
+      const formattedTargetDate = tagretDate.toISOString().slice(0, 10);
+      if(j < reservationInfo.length){
+        if (formattedTargetDate === reservationInfo[j].date.toISOString().slice(0, 10)) {
+          shift1Array[i] = reservationInfo[j].shift_1;
+          shift2Array[i] = reservationInfo[j].shift_2;
+          j++;
+        } 
+        else {
+          shift1Array[i] = 0;
+          shift2Array[i] = 0;
+        }
+      }
+      else {
+        shift1Array[i] = 0;
+        shift2Array[i] = 0;
+      }
+    }
+
+    res.send(
+      {
+        dateArray,
+        shift1Array,
+        shift2Array,
+        userReservation,
+      });
   } 
   catch(error)
   {
@@ -72,40 +85,51 @@ async function getInfo(req,res){
   }
 }
 
-/* Xác nhận đăng ký phòng đọc ----------------------------------------------------*/
+/* Xác nhận ĐẶT CHỖ phòng đọc -----------------------------------------------------------*/
 async function confirmReservation (req,res){
   try {
-    const user = req.session.userInfo;
-    const reg = req.body;
+    const userID = req.body.userID;
+    const date = req.body.date;
+    const shift = req.body.shift;
 
-    // console.log('ngày:', reg.date);
-    // console.log('kíp:', reg.shift);
-    // console.log('user: ', user);
-
-    model.rsvnConfirm(user,reg);
-
-    res.redirect('userPage');
-  } catch (error) {
+    const userRerervstion = await model.user_ReservationInfo(userID); 
+    if(userRerervstion.rsvn.length >= process.env.MAX_RESERVATION){
+      res.send({status:"exceeded"});
+    }
+    else{
+      const maxRsvnDay = new Date(new Date().setDate(new Date().getDate() + 6)).toISOString().split('T')[0];
+      if(date.split(' ')[0] >= maxRsvnDay) res.send({status:"unavailable"});
+      else {
+        model.user_ReservationConfirm(userID,date,shift);
+        res.send({status:"ok"});
+      }
+    }
+  } 
+  catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.send({status:"error"});
   }
 }
 
-/* HỦY đăng ký phòng đọc ----------------------------------------------------------- */
+/* HỦY đặt chỗ phòng đọc ----------------------------------------------------------- */
 async function delReservation (req,res){
   try {
-    const user = req.session.userInfo;
-    await model.rsvnDelete(user);
-    res.redirect('userPage');
-  } catch (error) {
+    const userID = req.body.userID;
+    console.log("UserID: " + req.body.userID + " hủy đăng ký");
+    //const rsvn = req.rsvn;
+    await model.user_ReservationDelete(userID);
+    res.status(200);
+  } 
+  catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500);
   }
 }
 
 module.exports = {
     getBorrowedBookList,
+    getReadingRoomInfo,
     confirmReservation,
     delReservation,
-    getInfo,
+    getRsvnInfo,
 }

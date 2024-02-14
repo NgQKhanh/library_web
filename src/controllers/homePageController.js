@@ -3,7 +3,7 @@
 
 const model = require('../models/Model');
 
-/* Hiển thị trang chủ ---------------------------------------------------*/
+/* Hiển thị trang chủ --------------------------------------------------------*/
 let getHomePage = async (req, res) =>
 {
   const user = req.session.user;
@@ -31,7 +31,7 @@ function layout (req, res)
   res.render(pageLayout);
 };
 
-/* Tìm tên sách -------------------------------------------------------------*/
+/* Tìm tên sách --------------------------------------------------------------*/
 async function getBookName (req, res)
 {
   const { bookID } = req.body;
@@ -56,7 +56,7 @@ async function confirmBorrow (req,res){
 
     console.log('Received borrowBookList:', bookIDList);
 
-    await model.user_BorrowUpdate(user.id, bookIDList);
+    await model.user_BorrowConfirm(user.id, bookIDList);
 
     res.status(200).json({ message: 'Borrow confirmed successfully.' });
   } catch (error) {
@@ -73,7 +73,7 @@ async function confirmReturn (req,res){
 
     console.log('Received returnBookList:', bookIDList);
 
-    await model.user_ReturnUpdate(user.id, bookIDList);
+    await model.user_ReturnConfirm(user.id, bookIDList);
 
     res.status(200).json({ message: 'Borrow confirmed successfully.' });
   } catch (error) {
@@ -82,6 +82,24 @@ async function confirmReturn (req,res){
   }
 }
 
+/* Tra cứu tài liệu --------------------------------------------------------- */
+async function search (req,res){
+  const query = req.query.query;
+  res.render('search', { results: [] });
+}
+
+/* test GET API */
+function test (req, res)
+{
+  if (req.body.api_key !== process.env.API_KEY)
+  return next(new AppError(400, 'API key mismatch'));
+  console.log(req.body.station);
+  const responseObject = {
+    api_key: "kingdom12",
+    station: req.body.station
+  };
+  res.status(200).send("ok");
+}
 
 module.exports = {
     getHomePage,
@@ -89,4 +107,6 @@ module.exports = {
     getBookName,
     confirmBorrow,
     confirmReturn,
+    search,
+    test
 }

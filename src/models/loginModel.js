@@ -14,7 +14,7 @@ async function findByUserID (userId)
     else{
       const user = new User({
         id: rows[0].userID, 
-        username: rows[0].hoTen, 
+        username: rows[0].fullName, 
       });
     console.log(user);
     return user;
@@ -35,7 +35,7 @@ async function auth (userAuth)
     else{
       const user = new User({
         id: rows[0].userID, 
-        username: rows[0].hoTen, 
+        username: rows[0].fullName, 
       });
     console.log(user);
     return user;
