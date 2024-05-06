@@ -91,14 +91,21 @@ async function search (req,res){
 /* test GET API */
 function test (req, res)
 {
-  if (req.body.api_key !== process.env.API_KEY)
-  return next(new AppError(400, 'API key mismatch'));
-  console.log(req.body.station);
-  const responseObject = {
-    api_key: "kingdom12",
-    station: req.body.station
-  };
+  // if (req.body.api_key !== process.env.API_KEY)
+  // return next(new AppError(400, 'API key mismatch'));
+  // console.log(req.body.station);
+  // const responseObject = {
+  //   api_key: "kingdom12",
+  //   station: req.body.station
+  // };
+
+  console.log(req.body.test);
   res.status(200).send("ok");
+}
+
+function getTest (req, res)
+{
+  res.render('test');
 }
 
 module.exports = {
@@ -108,5 +115,6 @@ module.exports = {
     confirmBorrow,
     confirmReturn,
     search,
-    test
+    test,
+    getTest,
 }

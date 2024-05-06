@@ -6,7 +6,7 @@ const sql = require('./database');
 async function ReadingRoomInfo(req,res) {
   try {
     /* Kiểm tra số người trong phòng đọc tự do */
-    const [userNumber] = await sql.execute("SELECT * FROM `reading room` WHERE 1");
+    const [userNumber] = await sql.execute("SELECT * FROM `readingRoom` WHERE 1");
     return( {
       userNumber: userNumber.length,
     });

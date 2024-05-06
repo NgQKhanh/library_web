@@ -26,5 +26,6 @@ router.get('/search',homePage.search)
 
 /* test GET API*/
 router.post('/test', homePage.test);
+router.get('/test', homePage.getTest);
 
 module.exports = router;
