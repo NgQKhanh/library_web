@@ -4,7 +4,7 @@
 const model = require('../models/Model');
 
 /* Hiển thị trang chủ --------------------------------------------------------*/
-let getHomePage = async (req, res) =>
+let getRFIDHomePage = async (req, res) =>
 {
   const user = req.session.user;
   try
@@ -15,7 +15,28 @@ let getHomePage = async (req, res) =>
     const reservation = await model.ReservationInfo();
     console.log(reservation);
 
-    res.render('homePage.ejs', { user , borrowedBooks, readingRoom, reservation});
+    res.render('RFIDHomePage.ejs', { user , borrowedBooks, readingRoom, reservation});
+  } 
+  catch(error)
+  {
+    console.error("Error in borrowed book:", error);
+    res.status(500).send("Đã có lỗi xảy ra!");
+  }
+}
+
+/* Hiển thị trang chủ ADMIN --------------------------------------------------------*/
+let getAdminHomePage = async (req, res) =>
+{
+  const user = req.session.user;
+  try
+  {
+    /* Lấy thông tin người dùng, thông tin phòng đọc */
+    const borrowedBooks = await model.user_BorrowedBookList(user.id);
+    const readingRoom = await model.ReadingRoomInfo();
+    const reservation = await model.ReservationInfo();
+    console.log(reservation);
+
+    res.render('adminHomePage.ejs', { user , borrowedBooks, readingRoom, reservation});
   } 
   catch(error)
   {
@@ -82,24 +103,31 @@ async function confirmReturn (req,res){
   }
 }
 
-/* Tra cứu tài liệu --------------------------------------------------------- */
+/* Tra cứu tài liệu ----------------------------------------------------------- */
 async function search (req,res){
   const query = req.query.query;
   res.render('search', { results: [] });
 }
 
-/* test GET API */
+/* Hiển thị vị trí hiện tại của ESP32 --------------------------------------------*/
+function location (req, res){
+  console.log(req.body);
+  res.status(200).send("Coordinate updated");
+}
+
+function showLocation (req, res)
+{
+  res.render('location');
+}
+
+/* test function */
 function test (req, res)
 {
-  // if (req.body.api_key !== process.env.API_KEY)
-  // return next(new AppError(400, 'API key mismatch'));
-  // console.log(req.body.station);
-  // const responseObject = {
-  //   api_key: "kingdom12",
-  //   station: req.body.station
-  // };
+  const { x, y } = req.body;
+  userLocation = { x, y };
+  res.send('Coordinate updated');
 
-  console.log(req.body.test);
+  console.log(req.body);
   res.status(200).send("ok");
 }
 
@@ -109,7 +137,7 @@ function getTest (req, res)
 }
 
 module.exports = {
-    getHomePage,
+    getRFIDHomePage,
     layout,
     getBookName,
     confirmBorrow,
@@ -117,4 +145,7 @@ module.exports = {
     search,
     test,
     getTest,
+    location,
+    showLocation,
+    getAdminHomePage,
 }

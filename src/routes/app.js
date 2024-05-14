@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const login = require('../controllers/appLoginController');
-const userApp = require('../controllers/userAppController');
+const userApp = require('../controllers/appController');
 
 /* Người dùng đăng nhập app */
 router.post('/login',login.authenticate);

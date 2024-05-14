@@ -75,7 +75,7 @@ async function user_BorrowConfirm(userID, bookIDs){
   } 
   catch (error) 
   {
-    throw new Error("Error");
+    console.error('Model error when confirm borrow book list:', error);
   }
 }
 
@@ -91,7 +91,7 @@ async function user_ReturnConfirm(userID, bookIDs){
   } 
   catch (error) 
   {
-    console.error('Error:', error);
+    console.error('Model error when confirm return book list:', error);
   }
 }
 
@@ -120,7 +120,7 @@ async function user_ReservationInfo(userID) {
   } 
   catch (error) 
   {
-    console.error("Error in readingRoomInfo:", error);
+    console.error("Error when fetching reading room info:", error);
     throw new Error("Error fetching reading room info");
   }
 }
@@ -137,7 +137,7 @@ async function user_ReservationConfirm(userID, date, shift){
   } 
   catch (error) 
   {
-    console.error('Error:', error);
+    console.error('Model error when user confirm reservation: ', error);
   }
 }
 

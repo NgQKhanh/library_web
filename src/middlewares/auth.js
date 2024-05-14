@@ -1,4 +1,4 @@
-exports.loggedin = (req, res, next) => {
+exports.RFIDLoggedin = (req, res, next) => {
     if (req.session.loggedin) {
         res.locals.user = req.session.user;
         next();
@@ -7,12 +7,30 @@ exports.loggedin = (req, res, next) => {
     }
 }
 
-exports.isAuth = (req, res, next) => {
+exports.isRFIDAuth = (req, res, next) => {
     if (req.session.loggedin) {
         res.locals.user = req.session.user;
-        res.redirect('/home');
+        res.redirect('/RFIDHome');
     } else {
         next();
+    }
+}
+
+exports.isAdminAuth = (req, res, next) => {
+    if (req.session.loggedin) {
+        res.locals.user = req.session.user;
+        res.redirect('/adminHome');
+    } else {
+        next();
+    }
+}
+
+exports.adminLoggedin = (req, res, next) => {
+    if (req.session.userLoggedin) {
+        res.locals.user = req.session.user;
+        next();
+    } else {
+        res.redirect('/adminLogin')
     }
 }
 
@@ -22,14 +40,5 @@ exports.userLoggedin = (req, res, next) => {
         next();
     } else {
         res.redirect('/login')
-    }
-}
-
-exports.isUserAuth = (req, res, next) => {
-    if (req.session.userLoggedin) {
-        res.locals.userInfo = req.session.userInfo;
-        res.redirect('/userPage');
-    } else {
-        next();
     }
 }

@@ -1,17 +1,29 @@
 const express = require('express');
 const router = express.Router();
 
-const homePage = require('../controllers/homePageController');
+const homePage = require('../controllers/webHomePageController');
 const authMiddleware = require('../middlewares/auth');
-const RFIDLogin = require('../controllers/RFIDLoginController');
+const login = require('../controllers/webLoginController');
 
-/* Quẹt thẻ đăng nhập */
-router.get('/RFIDLogin', authMiddleware.isAuth, RFIDLogin.getLoginPage);
-router.post('/RFIDLogin', RFIDLogin.authenticate);
-router.post('/RFIDLogout', RFIDLogin.logout);
+/* ADMIN ---------------------------------------------------------------------------------------*/
 
-/* Hiển thị trang chủ */
-router.get('/home', authMiddleware.loggedin, homePage.getHomePage);
+/* Admin đăng nhập */
+router.get('/adminLogin', authMiddleware.isAdminAuth, login.getAdminLoginPage);
+router.post('/adminLogin', login.adminAuthenticate);
+router.post('/adminLogout', login.adminLogout);
+
+/* Hiển thị trang chủ Admin */
+router.get('/adminHome', authMiddleware.adminLoggedin, homePage.getAdminHomePage);
+
+/* QUẸT THẺ RFID --------------------------------------------------------------------------------*/
+
+/* Người dùng quẹt thẻ đăng nhập */
+router.get('/RFIDLogin', authMiddleware.isRFIDAuth, login.getRFIDLoginPage);
+router.post('/RFIDLogin', login.RFIDAuthenticate);
+router.post('/RFIDLogout', login.RFIDLogout);
+
+/* Hiển thị trang chủ người dùng */
+router.get('/RFIDHome', authMiddleware.RFIDLoggedin, homePage.getRFIDHomePage);
 
 /* Xử lý mượn/trả sách*/
 router.get('/load-page', homePage.layout);  //page layout hiển thị mượn/trả sách
@@ -22,7 +34,13 @@ router.post('/confirmReturn', homePage.confirmReturn);
 router.post('/bookName',homePage.getBookName);
 
 /* Tra cứu tài liệu */
-router.get('/search',homePage.search)
+router.get('/search',homePage.search);
+
+/*----------------------------------------------------------------------------------------------------
+* Hiển thị vị trí thực của ESP32
+*/
+router.post('/location', homePage.location);
+router.get('/location', homePage.showLocation);
 
 /* test GET API*/
 router.post('/test', homePage.test);
