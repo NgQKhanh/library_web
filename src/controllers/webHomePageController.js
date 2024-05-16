@@ -120,6 +120,11 @@ function showLocation (req, res)
   res.render('location');
 }
 
+function getdataGatheringPage (req, res)
+{
+  res.render('dataGatheringPage');
+}
+
 /* test function */
 function test (req, res)
 {
@@ -147,5 +152,6 @@ module.exports = {
     getTest,
     location,
     showLocation,
+    getdataGatheringPage,
     getAdminHomePage,
 }

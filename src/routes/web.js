@@ -41,6 +41,8 @@ router.get('/search',homePage.search);
 */
 router.post('/location', homePage.location);
 router.get('/location', homePage.showLocation);
+router.get('/dataGathering', homePage.getdataGatheringPage);
+//router.post('/dataGathering', homePage.getdataGatheringPage);
 
 /* test GET API*/
 router.post('/test', homePage.test);

@@ -1,0 +1,8 @@
+
+Send ID: 
+http://localhost:3000/sendID
+id = <int>
+
+Send location:
+http://localhost:3000/location
+location = <int>

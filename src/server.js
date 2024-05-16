@@ -25,6 +25,7 @@ app.use(session({
 
 socketIOManager.sendID(app, io);
 socketIOManager.sendLocation(app, io);
+socketIOManager.SocketToESP32(app,io);
 
 app.use('/',webRoutes);
 app.use('/app',appRoutes);
