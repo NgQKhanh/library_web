@@ -112,7 +112,7 @@ async function search (req,res){
 /* Hiển thị vị trí hiện tại của ESP32 --------------------------------------------*/
 function location (req, res){
   console.log(req.body);
-  res.status(200).send("Coordinate updated");
+  res.status(200);
 }
 
 function showLocation (req, res)

@@ -1,98 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grid Map with WebSocket</title>
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f0f0f0;
-    }
-    #container {
-        position: relative;
-        width: 800px;
-        height: 800px;
-    }
-    #backgroundCanvas, #gridMap {
-        position: absolute;
-        top: 0;
-        left: 0;
-        border: 1px solid #000;
-    }
-    #backgroundCanvas {
-        z-index: 0;
-    }
-    #gridMap {
-        z-index: 1;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indoor Navigation</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
 </head>
 <body>
-<div id="container">
-    <canvas id="backgroundCanvas" width="800" height="800"></canvas>
-    <canvas id="gridMap" width="800" height="800"></canvas>
-</div>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const backgroundCanvas = document.getElementById('backgroundCanvas');
-    const backgroundCtx = backgroundCanvas.getContext('2d');
-    const gridMap = document.getElementById('gridMap');
-    const gridCtx = gridMap.getContext('2d');
-    const gridSize = 40; // Kích thước ô
-
-    function drawBackgroundImage() {
-        const img = new Image();
-        img.src = '/image/t1.jpg';
-        img.onload = () => {
-            backgroundCtx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
-        }
-    }
-
-    function drawGrid() {
-        for (let x = 0; x <= gridMap.width; x += gridSize) {
-            gridCtx.moveTo(x, 0);
-            gridCtx.lineTo(x, gridMap.height);
-        }
-
-        for (let y = 0; y <= gridMap.height; y += gridSize) {
-            gridCtx.moveTo(0, y);
-            gridCtx.lineTo(gridMap.width, y);
-        }
-
-        gridCtx.strokeStyle = '#000';
-        gridCtx.stroke();
-    }
-
-    function drawRedDot(x, y) {
-        gridCtx.fillStyle = 'red';
-        gridCtx.beginPath();
-        gridCtx.arc(x * gridSize + gridSize / 2, y * gridSize + gridSize / 2, 5, 0, Math.PI * 2);
-        gridCtx.fill();
-    }
-
-    function clearGridCanvas() {
-        gridCtx.clearRect(0, 0, gridMap.width, gridMap.height);
-    }
-
-    drawBackgroundImage();
-    drawGrid();
-
-    const socket = io();
-
-    socket.on('location', (data) => {
-        const location = data;
-        let x = location % 20;
-        let y = Math.floor(location / 20);
-        clearGridCanvas();
-        drawGrid();
-        drawRedDot(x, y);
-    });
-</script>
+    <div class="container">
+        <div id="map-container">
+            <canvas id="map-canvas"></canvas>
+            <img src="floor-plan.jpg" alt="Floor Plan" id="floor-plan">
+        </div>
+        <div id="navigation">
+            <h2>Navigation</h2>
+            <label for="start">Start:</label>
+            <select id="start">
+                <option value="A">Point A</option>
+                <option value="B">Point B</option>
+            </select>
+            <label for="end">End:</label>
+            <select id="end">
+                <option value="A">Point A</option>
+                <option value="B">Point B</option>
+            </select>
+            <button onclick="navigate()">Navigate</button>
+            <p id="directions"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
+
+
+<style>
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: flex;
+}
+
+#map-container {
+    position: relative;
+}
+
+#map-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#floor-plan {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+#navigation {
+    margin-left: 20px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#navigation h2 {
+    margin-top: 0;
+}
+
+#navigation label {
+    display: block;
+    margin-top: 10px;
+}
+
+#navigation select, #navigation button {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+#directions {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+</style>
+
+<script>
+ // script.js
+document.addEventListener('DOMContentLoaded', (event) => {
+    const canvas = document.getElementById('map-canvas');
+    const ctx = canvas.getContext('2d');
+    const floorPlan = document.getElementById('floor-plan');
+
+    floorPlan.onload = () => {
+        canvas.width = floorPlan.width;
+        canvas.height = floorPlan.height;
+    };
+
+    function drawMarker(x, y, label) {
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#003300';
+        ctx.stroke();
+        ctx.fillStyle = 'white';
+        ctx.font = '12px Arial';
+        ctx.fillText(label, x - 3, y + 3);
+    }
+
+    function drawPath(start, end) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous paths
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'blue';
+        ctx.stroke();
+        drawMarker(start.x, start.y, 'A');
+        drawMarker(end.x, end.y, 'B');
+    }
+
+    window.navigate = function() {
+        const start = document.getElementById('start').value;
+        const end = document.getElementById('end').value;
+        let directions = '';
+
+        const points = {
+            'A': { x: 180, y: 240 }, // Coordinates for point A
+            'B': { x: 480, y: 480 }  // Coordinates for point B
+        };
+
+        if (start === end) {
+            directions = 'You are already at the destination!';
+        } else {
+            directions = `Navigate from Point ${start} to Point ${end}.`;
+            drawPath(points[start], points[end]);
+        }
+
+        document.getElementById('directions').innerText = directions;
+    }
+});
+
+</script>

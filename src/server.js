@@ -23,9 +23,9 @@ app.use(session({
   saveUninitialized: true,
 }))
 
-socketIOManager.sendID(app, io);
+socketIOManager.socketRFID(app, io);
+socketIOManager.socketIPS(app,io);
 socketIOManager.sendLocation(app, io);
-socketIOManager.SocketToESP32(app,io);
 
 app.use('/',webRoutes);
 app.use('/app',appRoutes);

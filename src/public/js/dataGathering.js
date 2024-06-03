@@ -18,7 +18,7 @@ document.getElementById('sendButton').addEventListener('click', function() {
 });
 
 // Lắng nghe sự kiện từ server
-socket.on('STW', function(data) {
+socket.on('STW/rssiArr', (data) => {
     console.log(data);
 
     // Chuyển đổi dữ liệu thành mảng các giá trị

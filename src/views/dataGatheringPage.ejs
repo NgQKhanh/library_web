@@ -29,7 +29,7 @@
       dataStatus.textContent = `Đang lấy dữ liệu Location ${lineNumber}...`;
     });
 
-    socket.on('STW', function(data) {
+    socket.on('STW/rssiArr', function(data) {
       const values = Object.values(data).map(Number);
       if (allData.length >= lineNumber) {
         allData[lineNumber - 1] = values;
@@ -47,6 +47,10 @@
       lineNumber++;
       const dataStatus = document.getElementById('dataStatus');
       dataStatus.textContent = `Location ${lineNumber} sẵn sàng lấy`;
+    });
+
+    socket.on('STW/sample', function(data) {
+      dataStatus.textContent = `Location ${lineNumber}: Sample: [${data.sample}/${data.freq}]`;
     });
 
     document.getElementById('saveButton').addEventListener('click', function() {

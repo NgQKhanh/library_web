@@ -35,8 +35,8 @@
 </head>
 <body>
 <div id="container">
-    <canvas id="backgroundCanvas" width="400" height="400"></canvas>
-    <canvas id="gridMap" width="400" height="400"></canvas>
+    <canvas id="backgroundCanvas" width="200" height="360"></canvas>
+    <canvas id="gridMap" width="200" height="360"></canvas>
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -48,7 +48,7 @@
 
     function drawBackgroundImage() {
         const img = new Image();
-        img.src = '/image/t1.jpg';
+        //img.src = '/image/t1.jpg';
         img.onload = () => {
             backgroundCtx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
         }
@@ -85,10 +85,11 @@
 
     const socket = io();
 
-    socket.on('location', (data) => {
-        const location = data;
+    socket.on('STW/location', (data) => {
+        const location = data.data_0;
+        console.log("test2: " + location);
         let x = location % 20;
-        let y = Math.floor(location / 20);
+        let y = Math.floor(location / 5);
         clearGridCanvas();
         drawGrid();
         drawRedDot(x, y);
