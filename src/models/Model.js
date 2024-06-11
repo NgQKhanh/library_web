@@ -59,6 +59,35 @@ async function findByBookID (bookId)
   }
 }
 
+/* Tìm kiếm sách ---------------------------------------------------*/
+async function searchBook (keyWord, field)
+{
+  try{
+    const [rows] = await sql.execute(`SELECT * from book WHERE ${field} LIKE '%${keyWord}%'`);
+    if(!rows.length) return null;
+    else{
+      return(rows);
+    }
+  }catch (error) {
+      console.error("Error in findByBookID:", error);
+      throw new Error("Error fetching book by ID");
+  }
+}
+/* Tìm kiếm bản sách ---------------------------------------------------*/
+async function searchBookCopy (id)
+{
+  try{
+    const [rows] = await sql.execute(`SELECT * from book_copy WHERE id = ${id}`);
+    if(!rows.length) return null;
+    else{
+      return(rows);
+    }
+  }catch (error) {
+      console.error("Error in findByBookID:", error);
+      throw new Error("Error fetching book by ID");
+  }
+}
+
 /*
   *_______________________________________PHẦN LIÊN QUAN ĐẾN NGƯỜI DÙNG____________________________________________________
  */
@@ -189,6 +218,8 @@ module.exports = {
   ReadingRoomInfo,
   ReservationInfo,
   findByBookID,
+  searchBook,
+  searchBookCopy,
 
   user_BorrowedBookList,
   user_BorrowConfirm,

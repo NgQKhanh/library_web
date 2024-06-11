@@ -2,7 +2,7 @@
 borrowBookList = [];
 updateBorrowList();
 
-/* Khi có socket event */
+/* Khi quét RFID sách => socket event */
 socket.on('ID', async (msg) => {
 try {
     /* Gửi yêu cầu tìm tên sách */

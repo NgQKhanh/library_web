@@ -105,8 +105,21 @@ async function confirmReturn (req,res){
 
 /* Tra cứu tài liệu ----------------------------------------------------------- */
 async function search (req,res){
-  const query = req.query.query;
-  res.render('search', { results: [] });
+  try {
+    const keyWord = req.query.key;
+    const field = req.query.field;
+    if(keyWord != ''){
+      const bookData = await model.searchBook(keyWord,field);
+      res.json(bookData);
+    }
+    else{
+  
+    }
+  } 
+  catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
 
 /* Hiển thị vị trí hiện tại của ESP32 --------------------------------------------*/
@@ -128,9 +141,8 @@ function getdataGatheringPage (req, res)
 /* test function */
 async function test (req,res){
   try {
-    const data = req.body.id;
-    const bookName = await model.findByBookID(data);
-    console.log('bookName:', bookName);
+    const bookData = await model.searchBookCopy(1);
+    console.log(bookData);
     res.status(200).json({ message: 'Verify successfully.' });
   } 
   catch (error) {

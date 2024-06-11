@@ -19,7 +19,7 @@ body{
 
 .user-info, .service {
     width: 50%; /* Chia đều không gian giữa hai div */
-    padding: 10px; /* Thêm padding nếu cần thiết */
+    padding: 10px; 
 }
 
 /* Xếp các button trong 1 hàng */
@@ -65,8 +65,8 @@ button:hover{
 
 #user{
     margin: 20px auto;
-    width: 500px;
     text-align: left;
+    width: 600px;
     background-color: white;
     padding: 20px;
     border-radius:10px; 
@@ -74,8 +74,8 @@ button:hover{
 
 .service{
     margin: 20px auto;
-    width: 500px;
     text-align: left;
+    width: 600px; 
     background-color: white;
     padding: 20px;
     border-radius:10px; 
@@ -102,3 +102,84 @@ th {
     background-color: #4caf50;
     color: white;
 }
+
+/* CSS cho search ------------------------------------------------------------ */
+#searchContainer {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px 0;
+}
+
+#searchForm {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#searchForm input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+#searchForm select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+#searchForm button {
+    padding: 10px 20px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#searchForm button:hover {
+    background: #0056b3;
+}
+
+#searchResults ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#searchResults li {
+    background: #fafafa;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+#searchResults li:hover {
+    background: #f0f0f0;
+}
+
+#bookDetails {
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+
+#bookDetails h3 {
+    margin-top: 0;
+}
+
+#bookDetails p {
+    margin: 5px 0;
+}
+/* -------------------------------------------------------------------------------------- */

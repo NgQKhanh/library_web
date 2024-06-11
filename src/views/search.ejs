@@ -1,52 +1,100 @@
-
 <h2>Tra cứu tài liệu </h2>
 
 <div id="searchContainer">
     <form id="searchForm" action="/search" method="GET">
-        <input type="text" name="query" placeholder="Nhập từ khóa">
-        <button type="submit">Search</button>
+        <input type="text" id="key" placeholder="Nhập từ khóa">
+        <select id="field" name="field">
+            <option value="bookName">Tên sách</option>
+            <option value="author">Tác giả</option>
+            <option value="publisher">Nhà xuất bản</option>
+            <option value="category">Thể loại</option>
+        </select>
+        <button type="submit">Tìm kiếm</button>
     </form>
     <div id="searchResults">
-        <!-- Search results will be displayed here -->
+        <ul id="results">
+            <!-- Search results will be displayed here -->
+        </ul>
+    </div>
+    <div id="bookDetails">
+        <!-- Book details will be displayed here -->
     </div>
 </div>
 
 <script>
-    // public/app.js
-document.getElementById('searchForm').addEventListener('submit', async function (event) {
-    event.preventDefault(); // Prevent the form from submitting in the traditional way
+    const searchForm = document.querySelector('#searchForm');
+    const keyWord = document.querySelector('#key');
+    const fieldSelect = document.querySelector('#field');
+    const resultsList = document.querySelector('#results');
+    const bookDetails = document.querySelector('#bookDetails');
 
-    const query = document.querySelector('input[name="query"]').value;
-    const resultsContainer = document.getElementById('searchResults');
+    let htmlBookCopy = '';
 
-    try {
-        // Perform an asynchronous fetch to the server
-        const response = await fetch(`/search?query=${encodeURIComponent(query)}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        loadData(keyWord.value, fieldSelect.value);
+    });
 
-        // Check if the response was successful (status code in the range 200-299)
-        if (response.ok) {
-            const results = await response.json();
+    function loadData(key = '', field = 'bookName') {
+        const request = new XMLHttpRequest();
+        request.open('GET', `/search?key=${key}&field=${field}`);
+        request.onload = () => {
+            const results = JSON.parse(request.responseText);
+            let html = '';
 
-            // Update the DOM with search results
-            if (results.length > 0) {
-                resultsContainer.innerHTML = `<h3>Kết quả tìm kiếm:</h3><ul>${results.map(result => `<li>${result}</li>`).join('')}</ul>`;
+            if (results != null) {
+                results.forEach(result => {
+                    html += `<li data-book='${JSON.stringify(result)}'>
+                                ${result.bookName} - ${result.author}
+                            </li>`;
+                });
             } else {
-                resultsContainer.innerHTML = '<p>Không tìm thấy kết quả.</p>';
+                html += `<h3>Không tìm thấy kết quả!</h3>`;
             }
-        } else {
-            console.error('Error:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error:', error.message);
+            resultsList.innerHTML = html;
+            attachClickHandlers();
+        };
+        request.send();
     }
-});
 
+    function attachClickHandlers() {
+        const items = resultsList.querySelectorAll('li');
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const book = JSON.parse(item.getAttribute('data-book'));
+                htmlBookCopy += 
+                    `<tr>
+                        <td>` + "123456"+ `</td>
+                        <td>` + "có sẵn" + `</td>
+                        <td>` + "A001" + `</td>
+                    </tr>`;
+                displayBookDetails(book);
+            });
+        });
+    }
+
+    function displayBookDetails(book) {
+        bookDetails.innerHTML = `
+            <h3>${book.bookName}</h3>
+            <p><strong>Tác giả:</strong> ${book.author}</p>
+            <p><strong>Nhà xuất bản:</strong> ${book.publisher}</p>
+            <p><strong>Thể loại:</strong> ${book.category}</p>`;
+        bookDetails.innerHTML +=  
+            `<table>
+                <thead>
+                    <tr>
+                        <th>bookID</th>
+                        <th>Trạng thái</th>
+                        <th>Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+        bookDetails.innerHTML +=            `<tr>
+                        <td>` + "123456"+ `</td>
+                        <td>` + "có sẵn" + `</td>
+                        <td>` + "A001" + `</td>
+                    </tr>
+                </tbody>
+            </table>`;
+    }   
 </script>
-
-
-
