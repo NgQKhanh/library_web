@@ -1,64 +1,62 @@
 
-// Kết nối đến server Socket.IO
 const socket = io();
-
-// Biến đếm số dòng
 let lineNumber = 1;
-
-// Biến lưu trữ dữ liệu
 const allData = [];
 
-// Thêm sự kiện bấm nút lấy dữ liệu
 document.getElementById('sendButton').addEventListener('click', function() {
-    // Gửi lệnh điều khiển ESP cho server
     socket.emit('WTS', { message: 'Hello ESP32: Web send instruction' });
-    // Hiển thị trạng thái dữ liệu
     const dataStatus = document.getElementById('dataStatus');
-    dataStatus.textContent = `Đang lấy dữ liệu Location ${lineNumber}`;
+    dataStatus.textContent = `Đang lấy dữ liệu Location ${lineNumber}...`;
 });
 
-// Lắng nghe sự kiện từ server
-socket.on('STW/rssiArr', (data) => {
-    console.log(data);
-
-    // Chuyển đổi dữ liệu thành mảng các giá trị
+socket.on('STW/rssiArr', function(data) {
     const values = Object.values(data).map(Number);
+    if (allData.length >= lineNumber) {
+    allData[lineNumber - 1] = values;
+    } else {
     allData.push(values);
+    }
 
-    // Hiển thị dữ liệu lên trang web, thêm dòng mới mỗi khi có dữ liệu mới
     const dataDisplay = document.getElementById('dataDisplay');
-    const newData = document.createElement('div'); // Tạo một phần tử div mới để chứa dữ liệu
-    newData.className = 'dataEntry'; // Thêm lớp CSS cho div mới
-    newData.textContent = `Location ${lineNumber}: ${JSON.stringify(values)}`; // Chuyển đổi dữ liệu thành chuỗi JSON để hiển thị
-    dataDisplay.appendChild(newData); // Thêm phần tử div mới vào dataDisplay
+    const newData = document.createElement('div');
+    newData.className = 'dataEntry';
+    newData.textContent = `Location ${lineNumber}: ${JSON.stringify(values)}`;
 
-    // Tăng số dòng
+    dataDisplay.appendChild(newData);
+
     lineNumber++;
     const dataStatus = document.getElementById('dataStatus');
     dataStatus.textContent = `Location ${lineNumber} sẵn sàng lấy`;
 });
 
-// Thêm sự kiện bấm nút lưu dữ liệu
+socket.on('STW/sample', function(data) {
+    dataStatus.textContent = `Location ${lineNumber}: Sample: [${data}/3]`;
+});
+
 document.getElementById('saveButton').addEventListener('click', function() {
-    // Chuyển đổi dữ liệu thành định dạng yêu cầu
     let formattedData = "{\n";
     allData.forEach((entry, index) => {
     formattedData += `    { ${entry.join(', ')} }${index < allData.length - 1 ? ',' : ''}\n`;
     });
     formattedData += "};";
 
-    // Tạo một Blob từ chuỗi dữ liệu định dạng
     const blob = new Blob([formattedData], { type: 'application/json' });
-
-    // Tạo URL cho Blob
     const url = URL.createObjectURL(blob);
 
-    // Tạo một phần tử a và nhấp vào nó để tải xuống file
     const a = document.createElement('a');
     a.href = url;
     a.download = 'data.json';
     a.click();
 
-    // Giải phóng bộ nhớ
     URL.revokeObjectURL(url);
+});
+
+document.getElementById('deleteButton').addEventListener('click', function() {
+    const dataDisplay = document.getElementById('dataDisplay');
+    if (dataDisplay.children.length > 0) {
+    dataDisplay.removeChild(dataDisplay.lastElementChild); // Xóa dòng dữ liệu cuối cùng
+    allData.pop(); // Xóa dữ liệu cuối cùng khỏi mảng
+    lineNumber--; // Giảm số dòng đi một
+    dataStatus.textContent = `Đã xoá dữ liệu Location ${lineNumber}!`;
+    }
 });

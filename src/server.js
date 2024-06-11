@@ -23,7 +23,7 @@ app.use(session({
   saveUninitialized: true,
 }))
 
-socketIOManager.socketRFID(app, io);
+socketIOManager.socketRFID(app,io);
 socketIOManager.socketIPS(app,io);
 socketIOManager.sendLocation(app, io);
 

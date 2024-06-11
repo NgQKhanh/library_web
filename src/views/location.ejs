@@ -86,9 +86,10 @@
     const socket = io();
 
     socket.on('STW/location', (data) => {
-        const location = data.data_0;
+        console.log(data);
+        const location = data;
         console.log("test2: " + location);
-        let x = location % 20;
+        let x = location % 5;
         let y = Math.floor(location / 5);
         clearGridCanvas();
         drawGrid();

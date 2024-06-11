@@ -59,8 +59,8 @@ async function getBookName (req, res)
   try
   {
     /* Tìm tên sách trong db */
-    const bookName = await model.findByBookID(bookID);
-    res.json(bookName);
+    const book = await model.findByBookID(bookID);
+    res.json(book);
   } 
   catch(error)
   {
@@ -126,14 +126,17 @@ function getdataGatheringPage (req, res)
 }
 
 /* test function */
-function test (req, res)
-{
-  const { x, y } = req.body;
-  userLocation = { x, y };
-  res.send('Coordinate updated');
-
-  console.log(req.body);
-  res.status(200).send("ok");
+async function test (req,res){
+  try {
+    const data = req.body.id;
+    const bookName = await model.findByBookID(data);
+    console.log('bookName:', bookName);
+    res.status(200).json({ message: 'Verify successfully.' });
+  } 
+  catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
 
 function getTest (req, res)
@@ -148,10 +151,11 @@ module.exports = {
     confirmBorrow,
     confirmReturn,
     search,
-    test,
-    getTest,
     location,
     showLocation,
     getdataGatheringPage,
     getAdminHomePage,
+
+    test,
+    getTest
 }

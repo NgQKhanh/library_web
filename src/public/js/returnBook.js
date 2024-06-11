@@ -15,12 +15,12 @@ try {
     {
     /* Lấy dữ liệu từ response */
     const bookData = await response.json();
-    const bookName = bookData.bookname;
+    const bookName = bookData.bookName;
     //console.log(bookName);
 
     /* Hiển thị danh sách sách muốn mượn */
     bookIDList.push(msg);
-    returnBookList.push(bookName);
+    returnBookList.push(bookData);
     updateReturnList();
     } 
     else

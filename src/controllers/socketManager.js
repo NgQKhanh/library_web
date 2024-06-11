@@ -15,21 +15,28 @@ function socketIPS(app, io) {
   io.on('connection', function (socket) {
 
     // Web to server
-    socket.on('WTS', function (payload) {
-      io.emit('STE',{event: payload.event});
-      console.log("[Socket] Request to ESP32" + String(payload.event));
+    socket.on('WTS', function () {
+      io.emit('STE');
+      console.log("[Socket] Request to ESP32");
     });
 
     // ESP32 to server
     socket.on('ETS', (payload) => {
       if(payload.event == "ON_location"){
+        //console.log("[ESP] location: " + payload.data);
         io.emit('STW/location', payload.data);
       }
       else if(payload.event == "OFF_rssiArr"){
+        //.log("[ESP] OFF_rssiArr: "+ JSON.stringify(payload.data));
         io.emit('STW/rssiArr', payload.data);
       }
       else if(payload.event == "OFF_sample"){
+        //console.log("[ESP] OFF_sample: "+payload.data);
         io.emit('STW/sample', payload.data);
+      }
+      else if(payload.event == "Notie"){
+        console.log("[ESP] Notice: "+payload.data);
+        //io.emit('STW/sample', payload.data);
       }
    });
    });
@@ -45,10 +52,10 @@ function socketIPS(app, io) {
 
 //---------------- HTTP POST: Location từ ESP32 => Socket: location page  -----------------
 function sendLocation(app, io) {
-  app.post('/location', (req, res) => {
-    const data = req.body.location;  
+  app.post('/ESPNotify', (req, res) => {
+    const data = req.body.message;  
     console.log(data); 
-    io.emit('location', data);
+    //io.emit('location', data);
     res.status(200).json();
   });
 }

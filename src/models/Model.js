@@ -6,7 +6,7 @@ const sql = require('./database');
 async function ReadingRoomInfo(req,res) {
   try {
     /* Kiểm tra số người trong phòng đọc tự do */
-    const [userNumber] = await sql.execute("SELECT * FROM `readingRoom` WHERE 1");
+    const [userNumber] = await sql.execute("SELECT * FROM `reading_room` WHERE 1");
     return( {
       userNumber: userNumber.length,
     });
@@ -46,11 +46,12 @@ async function ReservationInfo(req,res){
 async function findByBookID (bookId)
 {
   try{
-    const [rows] = await sql.execute("SELECT * from `books` WHERE bookID = ?",[bookId]);
+    const [rows] = await sql.execute("SELECT * from `book_copy` " +
+                                      "JOIN `book` ON book_copy.id = book.id " +
+                                      "WHERE book_copy.bookID = ?",[bookId]);
     if(!rows.length) return null;
     else{
-      return({bookname: rows[0].bookName});
-
+      return(rows[0]);
     }
   }catch (error) {
       console.error("Error in findByBookID:", error);
@@ -161,8 +162,10 @@ async function user_BorrowedBookList (userID)
     let dueDays = process.env.DUE_DAYS;
 
     const [rows] = await sql.execute(
-      "SELECT books.bookName, loan.borrowDate, DATE_ADD(loan.borrowDate, INTERVAL ? DAY) AS dueDate FROM `loan` "+ 
-      "JOIN `books` ON loan.bookID = books.bookID " +
+      "SELECT loan.borrowDate, DATE_ADD(loan.borrowDate, INTERVAL ? DAY) AS dueDate, book.bookName "+
+      "FROM `loan` "+ 
+      "JOIN `book_copy` ON loan.bookID = book_copy.bookID " +
+      "JOIN `book` ON book_copy.id = book.id " +
       "WHERE loan.userID = ?",[dueDays, userID]);
 
       if(!rows.length) return [];

@@ -15,11 +15,10 @@ try {
     {
         /* Lấy dữ liệu từ response */
         const bookData = await response.json();
-        const bookName = bookData.bookname;
 
         /* Hiển thị danh sách sách muốn mượn */
         bookIDList.push(msg);
-        borrowBookList.push(bookName);
+        borrowBookList.push(bookData);
         updateBorrowList();
     } 
     else
@@ -44,9 +43,12 @@ function updateBorrowList() {
     container.innerHTML = '';
 
     const ol = document.createElement('ol');
-    borrowBookList.forEach(bookName => {
+    borrowBookList.forEach(book => {
         const li = document.createElement('li');
-        li.textContent = bookName;
+        li.textContent = `${book.bookName} ,<br>
+        <i>Tác giả:</i> ${book.author},<br>
+        <i>Nhà xuất bản:</i> ${book.publisher},<br>
+        <i>Thể loại:</i> ${book.category}`;
         ol.appendChild(li);
     });
     /* Thêm danh sách vào container */
