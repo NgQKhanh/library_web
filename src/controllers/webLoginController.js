@@ -54,20 +54,15 @@ function getAdminLoginPage (req, res)
 
 /* Xử lý yêu cầu đăng nhập ADMIN */
 async function adminAuthenticate (req, res){
-  
-    const data = req.body;
-    console.log(data);
-    try{
-      /*  Tìm id người dùng trong danh sách */
-      // const user = await userModel.findByUserID(data.id);
-      // if(!user){
-      //   res.status(404).json({ success: false, message: 'Người dùng chưa đăng ký!' });
-      // }
-      // else {
-      //   req.session.loggedin = true;
-      //   req.session.user = user;
-        res.json({ success: true, message: 'Đăng nhập thành công', redirectTo: '/adminHome' });
-      //}
+   try{
+    console.log(req.body)
+      const { username, password } = req.body;
+      // Giả sử username là 'admin' và password là 'password'
+      if (username === 'admin' && password === '1') {
+          res.json({ success: true });
+      } else {
+          res.json({ success: false, message: 'Sai tên đăng nhập hoặc mật khẩu' });
+      }
     }
     catch(error){
       console.error("Error in findByUserID:", error);

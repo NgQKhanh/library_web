@@ -6,3 +6,34 @@ id = <int>
 Send location:
 http://localhost:3000/location
 location = <int>
+
+Lấy tên sách:
+localhost:3000/app/bookName?bookID=2
+{
+    "bookID": "2",
+    "status": 0,
+    "id": "2",
+    "location": "A002",
+    "bookName": "Đại số",
+    "author": "Nguyễn Cảnh Lương",
+    "publisher": "HUST",
+    "category": "Toán"
+}
+
+Tra cứu tài liệu:
+localhost:3000/app/search?type=title&key=<key_word>&field=bookName | author | publisher | category
+{
+    "list": [{
+        "id": "3",
+        "bookName": "Giải tích 1",
+        "author": "Trần Quốc Bình",
+        "publisher": "HUST",
+        "category": "Toán"
+    }, {
+        "id": "4",
+        "bookName": "Giải tích 2",
+        "author": "Bùi Xuân Diệu",
+        "publisher": "HUST",
+        "category": "Toán"
+    }]
+}

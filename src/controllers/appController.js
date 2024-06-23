@@ -126,10 +126,95 @@ async function delReservation (req,res){
   }
 }
 
+/* Tìm tên sách ----------------------------------------------------------- */
+async function getBookName (req,res){
+  try
+  {
+    const bookID = req.query.bookID;
+    /* Tìm tên sách trong db */
+    const book = await model.findByBookID(bookID);
+    res.status(200).json(book);
+  } 
+  catch(error)
+  {
+    console.error("Error in borrowed book:", error);
+    res.status(500).send("Đã có lỗi xảy ra!");
+  }
+}
+
+/* Tra cứu tài liệu ----------------------------------------------------------- */
+async function searchBook (req,res){
+  try {
+    const type = req.query.type;
+    if(type == "title")
+    {
+      const keyWord = req.query.key;
+      const field = req.query.field;
+      if(keyWord != ''){
+        const bookData = await model.searchBook(keyWord,field);
+        console.log("[App] search title: " + toString(bookData));
+        res.send({list:bookData});
+      }
+    }
+    else if (type == "copy")
+    {
+      const id = req.query.id;
+      if(id != ''){
+        const bookData = await model.searchBookCopy(id);
+        console.log("[App] search Copy: " + toString(bookData));
+        res.send({list:bookData});
+      }
+    }
+  } 
+  catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+/* Xác nhận mượn sách -------------------------------------------------------- */
+async function confirmBorrow (req,res){
+  try {
+    const user = req.session.user;
+    const bookIDList = req.body.bookIDList;
+
+    console.log('Received borrowBookList:', bookIDList);
+
+    await model.user_BorrowConfirm(user.id, bookIDList);
+
+    res.status(200).json({ message: 'Borrow confirmed successfully.' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+/* Xác nhận trả sách --------------------------------------------------------- */
+async function confirmReturn (req,res){
+  try {
+    const user = req.session.user;
+    const bookIDList = req.body.bookIDList;
+
+    console.log('Received returnBookList:', bookIDList);
+
+    await model.user_ReturnConfirm(user.id, bookIDList);
+
+    res.status(200).json({ message: 'Borrow confirmed successfully.' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+
 module.exports = {
     getBorrowedBookList,
     getReadingRoomInfo,
     confirmReservation,
     delReservation,
     getRsvnInfo,
+    getBookName,
+    searchBook,
+    confirmBorrow,
+    confirmReturn,
 }

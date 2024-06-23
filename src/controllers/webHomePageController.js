@@ -25,24 +25,9 @@ let getRFIDHomePage = async (req, res) =>
 }
 
 /* Hiển thị trang chủ ADMIN --------------------------------------------------------*/
-let getAdminHomePage = async (req, res) =>
+function getAdminHomePage (req,res)
 {
-  const user = req.session.user;
-  try
-  {
-    /* Lấy thông tin người dùng, thông tin phòng đọc */
-    const borrowedBooks = await model.user_BorrowedBookList(user.id);
-    const readingRoom = await model.ReadingRoomInfo();
-    const reservation = await model.ReservationInfo();
-    console.log(reservation);
-
-    res.render('adminHomePage.ejs', { user , borrowedBooks, readingRoom, reservation});
-  } 
-  catch(error)
-  {
-    console.error("Error in borrowed book:", error);
-    res.status(500).send("Đã có lỗi xảy ra!");
-  }
+    res.render('adminHomePage');
 }
 
 /* Hiển thị mượn/trả sách ----------------------------------------------------*/

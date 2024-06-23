@@ -8,12 +8,14 @@ const login = require('../controllers/webLoginController');
 /* ADMIN ---------------------------------------------------------------------------------------*/
 
 /* Admin đăng nhập */
-router.get('/adminLogin', authMiddleware.isAdminAuth, login.getAdminLoginPage);
+router.get('/adminLogin', login.getAdminLoginPage);
+//router.get('/adminLogin', authMiddleware.isAdminAuth, login.getAdminLoginPage);
 router.post('/adminLogin', login.adminAuthenticate);
 router.post('/adminLogout', login.adminLogout);
 
 /* Hiển thị trang chủ Admin */
-router.get('/adminHome', authMiddleware.adminLoggedin, homePage.getAdminHomePage);
+//router.get('/adminHome', authMiddleware.adminLoggedin, homePage.getAdminHomePage);
+router.get('/adminHome', homePage.getAdminHomePage);
 
 /* QUẸT THẺ RFID --------------------------------------------------------------------------------*/
 
