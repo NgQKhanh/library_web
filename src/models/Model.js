@@ -64,9 +64,16 @@ async function searchBook (keyWord, field)
 {
   try{
     const [rows] = await sql.execute(`SELECT * from book WHERE ${field} LIKE '%${keyWord}%'`);
-    if(!rows.length) return null;
+    if(!rows.length) return [];
     else{
-      return(rows);
+      const books = rows.map(item => ({
+        id: item.id,
+        bookName: item.bookName,
+        author: item.author,
+        publisher: item.publisher,
+        category: item.category
+      }));
+      return books;
     }
   }catch (error) {
       console.error("Error in findByBookID:", error);
@@ -78,9 +85,15 @@ async function searchBookCopy (id)
 {
   try{
     const [rows] = await sql.execute(`SELECT * from book_copy WHERE id = ${id}`);
-    if(!rows.length) return null;
+    if(!rows.length) return [];
     else{
-      return(rows);
+      const books = rows.map(item => ({
+        bookID: item.bookID,
+        status: item.status,
+        id: item.id,
+        location: item.location
+      }));
+      return books;
     }
   }catch (error) {
       console.error("Error in findByBookID:", error);

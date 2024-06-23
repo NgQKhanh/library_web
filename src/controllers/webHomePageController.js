@@ -104,16 +104,25 @@ async function confirmReturn (req,res){
 }
 
 /* Tra cứu tài liệu ----------------------------------------------------------- */
-async function search (req,res){
+async function searchBook (req,res){
   try {
-    const keyWord = req.query.key;
-    const field = req.query.field;
-    if(keyWord != ''){
-      const bookData = await model.searchBook(keyWord,field);
-      res.json(bookData);
+    const type = req.query.type;
+    if(type == "title")
+    {
+      const keyWord = req.query.key;
+      const field = req.query.field;
+      if(keyWord != ''){
+        const bookData = await model.searchBook(keyWord,field);
+        res.json(bookData);
+      }
     }
-    else{
-  
+    else if (type == "copy")
+    {
+      const id = req.query.id;
+      if(id != ''){
+        const bookData = await model.searchBookCopy(id);
+        res.json(bookData);
+      }
     }
   } 
   catch (error) {
@@ -151,9 +160,10 @@ async function test (req,res){
   }
 }
 
-function getTest (req, res)
+async function getTest (req, res)
 {
-  res.render('test');
+  const bookData = await model.searchBookCopy(1);
+  console.log(bookData);
 }
 
 module.exports = {
@@ -162,7 +172,7 @@ module.exports = {
     getBookName,
     confirmBorrow,
     confirmReturn,
-    search,
+    searchBook,
     location,
     showLocation,
     getdataGatheringPage,

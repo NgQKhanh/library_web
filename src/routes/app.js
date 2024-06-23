@@ -18,4 +18,10 @@ router.post('/getRsvnInfo', userApp.getRsvnInfo);
 router.post('/reservation', userApp.confirmReservation);
 router.post('/delrsvn', userApp.delReservation);
 
+/* Tìm kiếm tài liệu */
+router.get('/search', userApp.searchBook);
+
+/* Người dùng đăng nhập RFID */
+router.post('/RFIDlogin',login.authenticateRFID);
+
 module.exports = router;

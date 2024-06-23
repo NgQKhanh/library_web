@@ -30,14 +30,12 @@ async function auth (userAuth)
 {
   try{
     const [rows] = await sql.execute(`SELECT * from \`users\` WHERE username = "${userAuth.username}" AND password = ${userAuth.password}`);
-    //console.log(rows);
     if(!rows.length) return null;
     else{
       const user = new User({
         id: rows[0].userID, 
         username: rows[0].fullName, 
       });
-    console.log(user);
     return user;
     }
   }catch (error) {

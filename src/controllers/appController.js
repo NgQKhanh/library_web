@@ -126,10 +126,41 @@ async function delReservation (req,res){
   }
 }
 
+/* Tra cứu tài liệu ----------------------------------------------------------- */
+async function searchBook (req,res){
+  try {
+    const type = req.query.type;
+    if(type == "title")
+    {
+      const keyWord = req.query.key;
+      const field = req.query.field;
+      if(keyWord != ''){
+        const bookData = await model.searchBook(keyWord,field);
+        console.log("[App] search title: " + toString(bookData));
+        res.send({list:bookData});
+      }
+    }
+    else if (type == "copy")
+    {
+      const id = req.query.id;
+      if(id != ''){
+        const bookData = await model.searchBookCopy(id);
+        console.log("[App] search Copy: " + toString(bookData));
+        res.send({list:bookData});
+      }
+    }
+  } 
+  catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
     getBorrowedBookList,
     getReadingRoomInfo,
     confirmReservation,
     delReservation,
     getRsvnInfo,
+    searchBook,
 }

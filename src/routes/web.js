@@ -34,7 +34,7 @@ router.post('/confirmReturn', homePage.confirmReturn);
 router.post('/bookName',homePage.getBookName);
 
 /* Tra cứu tài liệu */
-router.get('/search',homePage.search);
+router.get('/search',homePage.searchBook);
 
 /*----------------------------------------------------------------------------------------------------
 * Hiển thị vị trí thực của ESP32

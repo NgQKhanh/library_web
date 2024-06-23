@@ -37,7 +37,7 @@
 
     function loadData(key = '', field = 'bookName') {
         const request = new XMLHttpRequest();
-        request.open('GET', `/search?key=${key}&field=${field}`);
+        request.open('GET', `/search?type=title&key=${key}&field=${field}`);
         request.onload = () => {
             const results = JSON.parse(request.responseText);
             let html = '';
