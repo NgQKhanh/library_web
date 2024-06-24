@@ -24,10 +24,14 @@ router.post('/getRsvnInfo', userApp.getRsvnInfo);
 router.post('/reservation', userApp.confirmReservation);
 router.post('/delrsvn', userApp.delReservation);
 
-/* self-service ______________________________________________________________________________________________ */
-
+/* Đăng nhập self-service */
 router.post('/RFIDlogin',login.authenticateRFID);
+
+/* Xác nhận mượn/trả sách */
 router.post('/confirmBorrow', userApp.confirmBorrow);
 router.post('/confirmReturn', userApp.confirmReturn);
+
+/* Lấy thông tin đặt chỗ ngồi ở phòng đọc */
+router.get('/getBookingSeat', userApp.getBookingSeat);
 
 module.exports = router;

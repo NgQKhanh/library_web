@@ -46,7 +46,7 @@ async function authenticateRFID (req, res){
     /*  Tìm id người dùng trong DB */
     const user = await Model.findByUserID(data.userId);
     if(!user){
-      res.status(400).json({ success: false, message: 'non register' });
+      res.status(404).send("UserID Not found!");
     }
     else {
       res.status(200).json({username:user.username});
@@ -54,7 +54,7 @@ async function authenticateRFID (req, res){
   }
   catch(error){
     console.error("Error in findByUserID:", error);
-    res.status(500).json({ success: false, message: 'server error' });
+    res.status(500).send('server error');
   }
 }
 

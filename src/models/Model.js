@@ -18,7 +18,7 @@ async function ReadingRoomInfo(req,res) {
   }
 }
 
-/* Lấy thông tin đăng ký phòng đọc ------------------------------------------ */
+/* Lấy thông tin số lượng đăng ký phòng đọc ------------------------------------------ */
 async function ReservationInfo(req,res){
   try 
   {
@@ -88,8 +88,30 @@ async function searchBookCopy (id)
   }
 }
 
+/* Lấy thông tin đặt chỗ ngồi ở phòng đọc ------------------------------------------- */
+async function getBookingSeatInfo(date, shift, room){
+  try 
+  {
+    const [rows] = await sql.execute(`SELECT * FROM reservation WHERE date = ${date} AND shift = ${shift} AND room = ${room} `);
+    console.log(rows)
+    let bSeat;
+    if(!rows.length) bSeat = [];
+    else
+    {
+      bSeat = rows.map(item => ({
+        seat: item.seat
+      }));
+    } 
+    return bSeat;
+  } 
+  catch (error) 
+  {
+    console.error('Error:', error);
+  }
+}
+
 /*
-  *_______________________________________PHẦN LIÊN QUAN ĐẾN NGƯỜI DÙNG____________________________________________________
+  *__________________________________________PHẦN LIÊN QUAN ĐẾN NGƯỜI DÙNG____________________________________________________________________
  */
   
 /* Người dùng (userID) xác nhận MƯỢN sách --------------------------------------------------- */
@@ -220,6 +242,7 @@ module.exports = {
   findByBookID,
   searchBook,
   searchBookCopy,
+  getBookingSeatInfo,
 
   user_BorrowedBookList,
   user_BorrowConfirm,

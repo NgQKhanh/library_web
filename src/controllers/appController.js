@@ -13,7 +13,7 @@ async function getBorrowedBookList(req,res){
   catch(error)
   {
     console.error("Error in borrowed book:", error);
-    res.status(500).send("Đã có lỗi xảy ra!");
+    res.status(500).json({ error: "Server error"});
   }
 }
 
@@ -28,11 +28,11 @@ async function getReadingRoomInfo(req,res){
   catch(error)
   {
     console.error("Error in borrowed book:", error);
-    res.status(500).send("Đã có lỗi xảy ra!");
+    res.status(500).json({ error: "Server error"});
   }
 }
 
-/* Lấy thông tin đặt chỗ -----------------------------------------------------------------*/
+/* Lấy thông tin số lượng đặt chỗ -----------------------------------------------------------------*/
 async function getRsvnInfo(req,res){
   const userID = req.body.userID;
   try
@@ -81,7 +81,7 @@ async function getRsvnInfo(req,res){
   catch(error)
   {
     console.error("Error in borrowed book:", error);
-    res.status(500).send("Đã có lỗi xảy ra!");
+    res.status(500).json({ error: "Server error"});
   }
 }
 
@@ -107,7 +107,7 @@ async function confirmReservation (req,res){
   } 
   catch (error) {
     console.error('Error:', error);
-    res.send({status:"error"});
+    res.status(500).json({ error: "Server error"});
   }
 }
 
@@ -122,7 +122,7 @@ async function delReservation (req,res){
   } 
   catch (error) {
     console.error('Error:', error);
-    res.status(500);
+    res.status(500).json({ error: "Server error"});
   }
 }
 
@@ -133,12 +133,16 @@ async function getBookName (req,res){
     const bookID = req.query.bookID;
     /* Tìm tên sách trong db */
     const book = await model.findByBookID(bookID);
-    res.status(200).json(book);
+    if(!book){
+      res.status(404).json({ error: "Book Not found!"});
+    }else{
+      res.status(200).json(book);
+    }
   } 
   catch(error)
   {
     console.error("Error in borrowed book:", error);
-    res.status(500).send("Đã có lỗi xảy ra!");
+    res.status(500).json({ error: "Server error"});
   }
 }
 
@@ -168,41 +172,62 @@ async function searchBook (req,res){
   } 
   catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Server error"});
   }
 }
 
 /* Xác nhận mượn sách -------------------------------------------------------- */
 async function confirmBorrow (req,res){
   try {
-    const user = req.session.user;
-    const bookIDList = req.body.bookIDList;
+    const userId = req.body.userId;
+    const bookIDList = req.body.bList;
 
-    console.log('Received borrowBookList:', bookIDList);
+    // console.log('Received borrowBookList:', bookIDList);
+    // console.log('Received :', userId);
 
-    await model.user_BorrowConfirm(user.id, bookIDList);
+    //await model.user_BorrowConfirm(user.id, bookIDList);
 
-    res.status(200).json({ message: 'Borrow confirmed successfully.' });
+    res.status(200).json({ message: 'Borrow success' });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Server error"});
   }
 }
 
 /* Xác nhận trả sách --------------------------------------------------------- */
 async function confirmReturn (req,res){
   try {
-    const user = req.session.user;
-    const bookIDList = req.body.bookIDList;
+    const userId = req.body.userId;
+    const bookIDList = req.body.rList;
 
-    console.log('Received returnBookList:', bookIDList);
+    console.log('Received return:', bookIDList);
+    console.log('Received :', userId);
 
-    await model.user_ReturnConfirm(user.id, bookIDList);
+   // await model.user_ReturnConfirm(user.id, bookIDList);
 
-    res.status(200).json({ message: 'Borrow confirmed successfully.' });
+    res.status(200).json({ message: 'Return success' });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Server error"});
+  }
+}
+
+/* Lấy thông tin đặt chỗ ngồi ở phòng đọc -----------------------------------------------------------------*/
+async function getBookingSeat(req,res){
+  try
+  {
+    const date = req.query.date;
+    const shift = req.query.shift;
+    const room = req.query.room;
+
+    const bSeat = await model.getBookingSeatInfo(date, shift, room); 
+    //res.status(200).send(bSeat); 
+    res.status(200).json({bSeat}); 
+  } 
+  catch(error)
+  {
+    console.error("Error in borrowed book:", error);
+    res.status(500).json({ error: "Server error"});
   }
 }
 
@@ -217,4 +242,5 @@ module.exports = {
     searchBook,
     confirmBorrow,
     confirmReturn,
+    getBookingSeat,
 }
