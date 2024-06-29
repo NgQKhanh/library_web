@@ -19,7 +19,7 @@ async function ReadingRoomInfo(req,res) {
 }
 
 /* Lấy thông tin số lượng đăng ký phòng đọc ------------------------------------------ */
-async function ReservationInfo(req,res){
+async function ReservationInfo(room){
   try 
   {
     /* Cập nhật ngày tháng đến hiện tại */
@@ -157,7 +157,7 @@ async function user_ReservationInfo(userID) {
     const tomorrowString = tomorrow.toISOString().split('T')[0];
 
     /* Lấy thông tin đặt chỗ*/
-    const [rsvnInfo] = await sql.execute(`SELECT * FROM \`reservation\` WHERE userID = '${userID}' AND date >= '${tomorrowString}'`);
+    const [rsvnInfo] = await sql.execute(`SELECT * FROM reservation WHERE userID = ${userID} AND date >= ${tomorrowString}`);
     
     let rsvn;
     if(!rsvnInfo.length) rsvn = [];
@@ -178,30 +178,30 @@ async function user_ReservationInfo(userID) {
 }
 
 /* Người dùng (userID) xác nhận ĐẶT chỗ phòng đọc ---------------------------------------------- */
-async function user_ReservationConfirm(userID, date, shift){
+async function user_ReservationConfirm(userID, date, shift, seat, room){
   try 
   {
-
     await sql.execute
-      (`INSERT INTO \`reservation\` ` +
-       `(\`userID\`, \`date\`, \`shift\`) VALUES ` +
-       `('${userID}', '${date}', ${shift});`);
+      (`INSERT INTO reservation ` +
+       `(userID, \`date\`, shift, seat, room) VALUES ` +
+       `(${userID}, '${date}', ${shift}, ${seat}, ${room})`);
   } 
   catch (error) 
   {
-    console.error('Model error when user confirm reservation: ', error);
+    throw error;
   }
 }
 
 /* Người dùng (userID) xác nhận HỦY đặt chỗ phòng đọc ------------------------------------------- */
-async function user_ReservationDelete(userID){
+async function user_ReservationDelete(userID, date, shift){
   try 
   {
-    await sql.execute("DELETE FROM `reservation` WHERE userID = ?", [userID]);
+    await sql.execute(`DELETE FROM reservation ` +
+                      `WHERE userID = ${userID} AND \`date\` = '${date}' AND shift = ${shift}`);
   } 
   catch (error) 
   {
-    console.error('Error:', error);
+    throw error;
   }
 }
 

@@ -8,32 +8,61 @@ http://localhost:3000/location
 location = <int>
 
 Lấy tên sách:
-localhost:3000/app/bookName?bookID=2
-{
-    "bookID": "2",
-    "status": 0,
-    "id": "2",
-    "location": "A002",
-    "bookName": "Đại số",
-    "author": "Nguyễn Cảnh Lương",
-    "publisher": "HUST",
-    "category": "Toán"
-}
+    localhost:3000/app/bookName?bookID=2
+    {
+        "bookID": "2",
+        "status": 0,
+        "id": "2",
+        "location": "A002",
+        "bookName": "Đại số",
+        "author": "Nguyễn Cảnh Lương",
+        "publisher": "HUST",
+        "category": "Toán"
+    }
 
 Tra cứu tài liệu:
-localhost:3000/app/search?type=title&key=<key_word>&field=bookName | author | publisher | category
-{
-    "list": [{
-        "id": "3",
-        "bookName": "Giải tích 1",
-        "author": "Trần Quốc Bình",
-        "publisher": "HUST",
-        "category": "Toán"
-    }, {
-        "id": "4",
-        "bookName": "Giải tích 2",
-        "author": "Bùi Xuân Diệu",
-        "publisher": "HUST",
-        "category": "Toán"
-    }]
-}
+    localhost:3000/app/search?type=title&key=<key_word>&field=bookName | author | publisher | category
+    {
+        "list": [{
+            "id": "3",
+            "bookName": "Giải tích 1",
+            "author": "Trần Quốc Bình",
+            "publisher": "HUST",
+            "category": "Toán"
+        }, {
+            "id": "4",
+            "bookName": "Giải tích 2",
+            "author": "Bùi Xuân Diệu",
+            "publisher": "HUST",
+            "category": "Toán"
+        }]
+    }
+
+    localhost:3000/app/search?type=copy&id=<book_id>
+    {
+        "list": [{
+            "bookID": "1",
+            "status": 0,
+            "id": "1",
+            "location": "A001"
+        }, {
+            "bookID": "1DEA5B041080",
+            "status": 0,
+            "id": "1",
+            "location": "A007"
+        }]
+    }
+
+Xác nhận đặt chỗ
+    http://localhost:3000/app/reservation
+    userID=1
+    date=2024-07-02
+    shift=1
+    seat=101
+    room=1
+
+Huỷ đặt chỗ
+    http://localhost:3000/app/delrsvn
+    userID=1
+    shift=1
+    date=2024-06-04
