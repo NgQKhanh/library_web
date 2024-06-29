@@ -27,7 +27,7 @@ let getRFIDHomePage = async (req, res) =>
 /* Hiển thị trang chủ ADMIN --------------------------------------------------------*/
 function getAdminHomePage (req,res)
 {
-    res.render('adminHomePage');
+    res.render('Admin/adminHomePage');
 }
 
 /* Hiển thị mượn/trả sách ----------------------------------------------------*/

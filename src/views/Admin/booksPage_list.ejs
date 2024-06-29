@@ -1,0 +1,27 @@
+
+<!-- Hiển thị toàn bộ sách -->
+<h3>Danh sách Sách</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tiêu đề</th>
+            <th>Tác giả</th>
+            <th>Nhà xuất bản</th>
+            <th>Thể loại</th>
+            <th>Tình trạng</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% books.forEach(book => { %>
+            <tr>
+                <td><%= book.id %></td>
+                <td><%= book.title %></td>
+                <td><%= book.author %></td>
+                <td><%= book.publisher %></td>
+                <td><%= book.category %></td>
+                <td><%= book.status %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>

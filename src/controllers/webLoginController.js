@@ -49,15 +49,14 @@ function RFIDLogout (req, res) {
 /* Hiển thị trang đăng nhập ADMIN */
 function getAdminLoginPage (req, res)
 {
-  res.render('adminLogin');
+  res.render('Admin/adminLogin');
 }
 
 /* Xử lý yêu cầu đăng nhập ADMIN */
 async function adminAuthenticate (req, res){
    try{
-    console.log(req.body)
       const { username, password } = req.body;
-      // Giả sử username là 'admin' và password là 'password'
+
       if (username === 'admin' && password === '1') {
           res.json({ success: true });
       } else {

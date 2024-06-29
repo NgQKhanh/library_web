@@ -5,9 +5,9 @@ const login = require('../controllers/appLoginController');
 const userApp = require('../controllers/appController');
 
 /* Người dùng đăng nhập app */
-router.post('/login',login.authenticate);
+router.post('/login',login.authenticate);   
 
-/* Tìm tên sách */
+/* Tìm tên sách */ 
 router.get('/bookName',userApp.getBookName);
 
 /* Lấy list sách mượn */
