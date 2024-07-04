@@ -1,5 +1,6 @@
 const model = require('../models/Model');
 const config = require('../controllers/config');
+const fs = require('../models/FirebaseService');
 
 /* Lấy danh sách sách mượn -----------------------------------------------------------------*/
 async function getBorrowedBookList(req,res){
@@ -34,64 +35,11 @@ async function getReadingRoomInfo(req,res){
 }
 
 /* Lấy thông tin số lượng đặt chỗ -----------------------------------------------------------------*/
-async function getRsvnInfo(req,res){
+async function getReservedSeatsCount(req,res){
   const room = req.body.room;
   try
   { //Lấy thông tin đặt chỗ từ db
     const reservationInfo = await model.ReservationInfo();
-
-    const maxDay = config.getValue("rsvnPeriod");
-    const currentDate = new Date();
-    let j = 0;
-    const dateArray = [];
-    const shift1Array = [];
-    const shift2Array = [];
-
-    for (let i = 0; i <= maxDay; i++) {
-      const tagretDate = new Date();
-      tagretDate.setDate(currentDate.getDate() + i);
-      dateArray[i] = tagretDate;
-
-      const formattedTargetDate = tagretDate.toISOString().slice(0, 10);
-      if(j < reservationInfo.length){
-        if (formattedTargetDate === reservationInfo[j].date.toISOString().slice(0, 10)) {
-          shift1Array[i] = reservationInfo[j].shift_1;
-          shift2Array[i] = reservationInfo[j].shift_2;
-          j++;
-        } 
-        else {
-          shift1Array[i] = 0;
-          shift2Array[i] = 0;
-        }
-      }
-      else {
-        shift1Array[i] = 0;
-        shift2Array[i] = 0;
-      }
-    }
-
-    res.send(
-      {
-        dateArray,
-        shift1Array,
-        shift2Array,
-      });
-  } 
-  catch(error)
-  {
-    console.error("Error in borrowed book:", error);
-    res.status(500).json({ error: "Server error"});
-  }
-}
-
-/* Lấy thông đặt chỗ của người dùng -----------------------------------------------------------------*/
-async function getRsvnInfo(req,res){
-  const userID = req.body.userID;
-  const room = req.body.room;
-  try
-  { //Lấy thông tin đặt chỗ từ db
-    const reservationInfo = await model.ReservationInfo();
-    const userReservation = await model.user_ReservationInfo(userID); 
 
     const maxDay = config.getValue("rsvnPeriod");
     const currentDate = new Date();
@@ -234,13 +182,13 @@ async function searchBook (req,res){
 /* Xác nhận mượn sách -------------------------------------------------------- */
 async function confirmBorrow (req,res){
   try {
-    const userId = req.body.userId;
+    const userID = req.body.userID;
     const bookIDList = req.body.bList;
 
-    // console.log('Received borrowBookList:', bookIDList);
-    // console.log('Received :', userId);
+    console.log('userID:', userID);
+    console.log('Received borrowBookList:', bookIDList);
 
-    //await model.user_BorrowConfirm(user.id, bookIDList);
+    await model.user_BorrowConfirm(userID, bookIDList, config.getValue("borrowPeriod"));
 
     res.status(200).json({ message: 'Borrow success' });
   } catch (error) {
@@ -252,31 +200,34 @@ async function confirmBorrow (req,res){
 /* Xác nhận trả sách --------------------------------------------------------- */
 async function confirmReturn (req,res){
   try {
-    const userId = req.body.userId;
+    const userID = req.body.userID;
     const bookIDList = req.body.rList;
 
     console.log('Received return:', bookIDList);
-    console.log('Received :', userId);
 
-   // await model.user_ReturnConfirm(user.id, bookIDList);
+    await model.user_ReturnConfirm(userID, bookIDList);
+
+    const result = await model.getBookRsvnInfo(bookIDList);
+
+    bookAvaiNotify(result);
 
     res.status(200).json({ message: 'Return success' });
-  } catch (error) {
+  } 
+  catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: "Server error"});
   }
 }
 
 /* Lấy thông tin đặt chỗ ngồi ở phòng đọc -----------------------------------------------------------------*/
-async function getBookingSeat(req,res){
+async function getRsvnSeat(req,res){
   try
   {
     const date = req.query.date;
     const shift = req.query.shift;
     const room = req.query.room;
 
-    const bSeat = await model.getBookingSeatInfo(date, shift, room); 
-    //res.status(200).send(bSeat); 
+    const bSeat = await model.getRsvnSeatInfo(date, shift, room);
     res.status(200).json({bSeat}); 
   } 
   catch(error)
@@ -286,16 +237,50 @@ async function getBookingSeat(req,res){
   }
 }
 
+/* Đặt sách --------------------------------------------------------- */
+async function reserveBook (req,res){
+  try {
+    const userID = req.query.userID;
+    const bookID = req.query.bookID;
+
+    const result = await model.user_reserveBook(userID, bookID);
+
+    res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: "Server error"});
+  }
+}
+
+/* Gửi thông báo sách đã có sẵn -----------------------------------------------------------------*/
+async function bookAvaiNotify (data){
+  try {
+    data.forEach(item => {
+      console.log("test here")
+      const registrationToken = "ciCsCOoRTNydr412J2PiHy:APA91bG9-lIgSU978IYBafQe3qB6elJj5-rGnAB1vDq6bU9XaBWiQqdvzO4fvGb5hdG0Lc8OMvuDt92dttpPSbvGg5c4rHqWuZ13ZMkt1LwjlMVRW824ujrOyVy5Fe6Ic_Lv8HGMjnJD";
+      fs.sendNotification(registrationToken, "Thông báo","Sách bạn đặt đã có sẵn trong thư viện!");
+    });    
+  } 
+  catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: "Server error"});
+  }
+}
 
 module.exports = {
     getBorrowedBookList,
     getReadingRoomInfo,
-    confirmReservation,
-    delReservation,
-    getRsvnInfo,
     getBookName,
     searchBook,
+
+    getReservedSeatsCount,
+    getRsvnSeat,
+    confirmReservation,
+    delReservation,
+
     confirmBorrow,
     confirmReturn,
-    getBookingSeat,
+
+    reserveBook,
+    bookAvaiNotify,
 }

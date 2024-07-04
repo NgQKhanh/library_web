@@ -1,0 +1,2 @@
+book_copy: 
+    status 0: có sẵn; status 1: đang mượn

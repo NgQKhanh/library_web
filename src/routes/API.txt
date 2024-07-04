@@ -66,3 +66,11 @@ Huỷ đặt chỗ
     userID=1
     shift=1
     date=2024-06-04
+
+
+Xác nhận mượn sách:
+http://localhost:3000/app/confirmBorrow
+{
+  "userID": 1,
+  "bList" : [6, 8]  
+}

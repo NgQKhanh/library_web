@@ -7,6 +7,9 @@ const userApp = require('../controllers/appController');
 /* Người dùng đăng nhập app */
 router.post('/login',login.authenticate);   
 
+/* Đăng nhập self-service */
+router.post('/RFIDlogin',login.authenticateRFID);
+
 /* Tìm tên sách */ 
 router.get('/bookName',userApp.getBookName);
 
@@ -20,18 +23,16 @@ router.get('/getRRInfo', userApp.getReadingRoomInfo);
 router.get('/search', userApp.searchBook);
 
 /* Đăng ký phòng đọc */
-router.post('/getRsvnInfo', userApp.getRsvnInfo);
-router.post('/reservation', userApp.confirmReservation);
-router.post('/delrsvn', userApp.delReservation);
-
-/* Đăng nhập self-service */
-router.post('/RFIDlogin',login.authenticateRFID);
+router.post('/getRsvnCount', userApp.getReservedSeatsCount);
+router.get('/getRsvnSeat', userApp.getRsvnSeat);
+router.post('/cfrRsvn', userApp.confirmReservation);
+router.post('/delRsvn', userApp.delReservation);
 
 /* Xác nhận mượn/trả sách */
 router.post('/confirmBorrow', userApp.confirmBorrow);
 router.post('/confirmReturn', userApp.confirmReturn);
 
-/* Lấy thông tin đặt chỗ ngồi ở phòng đọc */
-router.get('/getBookingSeat', userApp.getBookingSeat);
+/* Đặt sách */
+router.get('/reserveBook', userApp.reserveBook);
 
 module.exports = router;

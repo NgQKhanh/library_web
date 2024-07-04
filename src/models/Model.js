@@ -1,5 +1,6 @@
 
 const sql = require('./database');
+const fs = require('../models/FirebaseService');
 
 
 /* Lấy thông tin phòng đọc ----------------------------------------------- */
@@ -89,7 +90,7 @@ async function searchBookCopy (id)
 }
 
 /* Lấy thông tin đặt chỗ ngồi ở phòng đọc ------------------------------------------- */
-async function getBookingSeatInfo(date, shift, room){
+async function getRsvnSeatInfo(date, shift, room){
   try 
   {
     const [rows] = await sql.execute(`SELECT * FROM reservation WHERE date = ${date} AND shift = ${shift} AND room = ${room} `);
@@ -107,6 +108,36 @@ async function getBookingSeatInfo(date, shift, room){
   catch (error) 
   {
     console.error('Error:', error);
+  } 
+}
+
+/* Kiểm tra tin đặt sách ------------------------------------------- */
+async function getBookRsvnInfo(bookIDs){
+  try 
+  {
+    const bookList = bookIDs.map(bookID => `'${bookID}'`).join(' OR '); 
+    const [id] = await sql.execute(`SELECT id FROM book_copy WHERE bookID = ${bookList} `);
+
+    const idList = id.map(bookID => `'${bookID}'`).join(' OR '); 
+    const [name] = await sql.execute(`SELECT bookName FROM book WHERE id = ${idList} `);
+
+    const rsvnList = id.map(bookID => `'${bookID.id}'`).join(' OR ');
+    const [rows] = await sql.execute(`SELECT * FROM book_reservation WHERE bookID = ${rsvnList} `);
+  
+    let result;
+    if(!rows.length) result = [];
+    else
+    {
+      result = rows.map(item => ({
+        userID: item.userID,
+        bookID: item.bookID
+      }));
+    } 
+    return result;
+  } 
+  catch (error) 
+  {
+    console.error('Error:', error);
   }
 }
 
@@ -115,19 +146,21 @@ async function getBookingSeatInfo(date, shift, room){
  */
   
 /* Người dùng (userID) xác nhận MƯỢN sách --------------------------------------------------- */
-async function user_BorrowConfirm(userID, bookIDs){
+async function user_BorrowConfirm(userID, bookIDs, period){
   try 
-  { // Ngày mượn sách, cập nhật trạng thái đang mượn (status = 1)
+  { // Cập nhật ngày mượn sách, ngày đến hạn
     const currentDate = new Date().toISOString().slice(0, 10);
-    const borrowData = bookIDs.map(bookId => `('${userID}','${bookId}','${currentDate}')`).join(',');
-    const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
+    const borrowData = bookIDs.map(bookId => `('${userID}','${bookId}','${currentDate}', DATE_ADD(loan.borrowDate, INTERVAL ${period} DAY))`).join(','); 
+    console.log(borrowData);
+    await sql.execute(`INSERT INTO loan (userID, bookID,\`borrowDate\`, \`dueDate\`) VALUES ${borrowData}`);
 
-    await sql.execute(`INSERT INTO \`loan\`(\`userID\`, \`bookID\`,\`borrowDate\`) VALUES ${borrowData}`);
-    await sql.execute(`UPDATE \`books\` SET \`status\`='1' WHERE \`bookID\` IN (${status})`);
+    //Cập nhật trạng thái đang mượn (status = 1)
+    const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
+    await sql.execute(`UPDATE book_copy SET status = 1 WHERE bookID IN (${status})`);
   } 
   catch (error) 
   {
-    console.error('Model error when confirm borrow book list:', error);
+    throw new Error("Error when confirm borrow book list: ", error);
   }
 }
 
@@ -135,15 +168,17 @@ async function user_BorrowConfirm(userID, bookIDs){
 async function user_ReturnConfirm(userID, bookIDs){
   try 
   {
-    const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
-    const returnData = bookIDs.map(bookId => `bookID = '${bookId}'`).join(' OR ');
+    const returnData = bookIDs.map(bookId => ` '${bookId}'`).join(' OR ');
+    await sql.execute(`DELETE FROM loan WHERE userID = '${userID}' AND bookID = ${returnData}`);
+    console.log(`DELETE FROM loan WHERE userID = '${userID}' AND bookID = ${returnData}`);
 
-    await sql.execute(`DELETE FROM \`loan\` WHERE userID = '${userID}' AND ${returnData}`);
-    await sql.execute(`UPDATE \`books\` SET \`status\`='0' WHERE \`bookID\` IN (${status})`);
+    //Cập nhật trạng thái có sẵn (status = 0)
+    const status = bookIDs.map(bookId => `'${bookId}'`).join(',');
+    await sql.execute(`UPDATE book_copy SET status = 0 WHERE bookID IN (${status})`);
   } 
   catch (error) 
   {
-    console.error('Model error when confirm return book list:', error);
+    throw new Error("Error when confirm return book list: ", error);
   }
 }
 
@@ -172,8 +207,7 @@ async function user_ReservationInfo(userID) {
   } 
   catch (error) 
   {
-    console.error("Error when fetching reading room info:", error);
-    throw new Error("Error fetching reading room info");
+    throw new Error("Error fetching reading room info: ", error);
   }
 }
 
@@ -236,18 +270,37 @@ async function user_BorrowedBookList (userID)
   }
 }
 
+/* Người dùng (userID) Đặt sách --------------------------------------------------- */
+async function user_reserveBook(userID, bookID){
+  try 
+  { 
+    const [rows] = await sql.execute(`SELECT * from book_copy WHERE id = '${bookID}' AND status = 0`);
+    if(rows.length > 0) return {message: "available"};
+    else{
+      await sql.execute(`INSERT INTO book_reservation (userID, bookID) VALUES ( '${userID}', '${bookID}' )`);
+      return {message: "success"};
+    }
+  } 
+  catch (error) 
+  {
+    console.error('Model error when confirm borrow book list:', error);
+  }
+}
+
 module.exports = {
   ReadingRoomInfo,
   ReservationInfo,
   findByBookID,
   searchBook,
   searchBookCopy,
-  getBookingSeatInfo,
+  getRsvnSeatInfo,
+  getBookRsvnInfo,
 
   user_BorrowedBookList,
   user_BorrowConfirm,
   user_ReturnConfirm,
   user_ReservationConfirm,
   user_ReservationDelete,
-  user_ReservationInfo
+  user_ReservationInfo,
+  user_reserveBook
 }

@@ -2,6 +2,7 @@
 // http://localhost:3000/sendID
 
 const model = require('../models/Model');
+const notify = require('./notificationController')
 
 /* Hiển thị trang chủ --------------------------------------------------------*/
 let getRFIDHomePage = async (req, res) =>
@@ -138,7 +139,8 @@ async function test (req,res){
 
 function getTest (req, res)
 {
-  res.render('test');
+  notify.testNotify();
+  res.status(200).json({ message: 'Verify successfully.' });
 }
 
 module.exports = {
