@@ -2,6 +2,8 @@
 // http://localhost:3000/sendID
 
 const model = require('../models/Model');
+const bookRsvn = require('../models/bookRsvn');
+
 const notify = require('./notificationController')
 
 /* Hiển thị trang chủ --------------------------------------------------------*/
@@ -137,9 +139,11 @@ async function test (req,res){
   }
 }
 
-function getTest (req, res)
+async function getTest (req,res)
 {
   notify.testNotify();
+ // const reservations = await bookRsvn.findAll();
+  //console.log(reservations);
   res.status(200).json({ message: 'Verify successfully.' });
 }
 

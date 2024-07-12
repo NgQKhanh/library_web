@@ -7,7 +7,7 @@ Send location:
 http://localhost:3000/location
 location = <int>
 
-Lấy tên sách:
+Lấy tên sách: GET
     localhost:3000/app/bookName?bookID=2
     {
         "bookID": "2",
@@ -20,7 +20,7 @@ Lấy tên sách:
         "category": "Toán"
     }
 
-Tra cứu tài liệu:
+Tra cứu tài liệu: GET
     localhost:3000/app/search?type=title&key=<key_word>&field=bookName | author | publisher | category
     {
         "list": [{
@@ -53,24 +53,31 @@ Tra cứu tài liệu:
         }]
     }
 
-Xác nhận đặt chỗ
-    http://localhost:3000/app/reservation
+Xác nhận đặt chỗ: POST
+    http://localhost:3000/app/cfrRsvn
     userID=1
     date=2024-07-02
     shift=1
     seat=101
     room=1
 
-Huỷ đặt chỗ
-    http://localhost:3000/app/delrsvn
+Huỷ đặt chỗ: POST
+    http://localhost:3000/app/delRsvn
     userID=1
     shift=1
     date=2024-06-04
 
 
-Xác nhận mượn sách:
+Xác nhận mượn sách: POST
 http://localhost:3000/app/confirmBorrow
-{
-  "userID": 1,
-  "bList" : [6, 8]  
-}
+    {
+    "userID": 1,
+    "bList" : [6, 8]  
+    }
+
+Lấy list sách mượn: GET
+http://localhost:3000/app/getBBList?userID=1
+
+
+Lấy thông tin phòng đọc: GET
+http://localhost:3000/app/getRRInfo?room=201

@@ -1,4 +1,7 @@
 
+const { sequelize } = require('../config/database');
+const User = require('../models/user')(sequelize);
+
 const Model = require('../models/loginModel');
 
 const authRes = function(auth){
@@ -8,58 +11,72 @@ const authRes = function(auth){
 };
 
 /* Xử lý yêu cầu đăng nhập app điện thoại ----------------------------------------------*/
-async function authenticate (req, res){
-  
+async function MB_authenticate (req, res)
+{  
     const user = req.body;
     try{
-      /*  Xác nhận tên đăng nhập/mật khẩu */
-       const auth = await Model.auth(user);
+      /* Xác nhận tên đăng nhập/mật khẩu */
+      const result = await User.findAll({
+        where: {
+          username: user.username,
+          password: user.password
+        }
+      });
 
-       if(!auth){ // Đăng không nhập thành công
-        const aRes = new authRes({
-          status: false, 
-          userID: null, 
-          username: null,
+      if(0 == result.length){ 
+        res.status(404).json({ message: "Not found!"});
+      }
+      else if(result.length > 1){
+        res.status(500).json({ error: "Server error"});
+      }
+      else { 
+        //Đăng nhập thành công
+        res.status(200).json({
+          userID: result[0].toJSON().userID, 
+          username: result[0].toJSON().fullName,
         });
-         res.send(aRes);
-       }
-      else { //Đăng nhập thành công
-        const aRes = new authRes({
-          status: true, 
-          userID: auth.id, 
-          username: auth.username,
-        });
-         res.send(aRes);
       }
     }
     catch(error){
       console.error("Error: ", error);
-      res.send('Lỗi server, vui lòng thử lại sau.');
+      res.status(500).json({ error: "Server error"});
     }
 }
 
 /* Xử lý yêu cầu đăng nhập RFID ở self service ----------------------------------------------*/
-async function authenticateRFID (req, res){
-  
-  const data = req.body;
+async function PC_authenticate (req, res)
+{  
+  const userID = req.body.userID;
+  console.log(userID)
   try{
-    /*  Tìm id người dùng trong DB */
-    const user = await Model.findByUserID(data.userId);
-    if(!user){
-      res.status(404).send("UserID Not found!");
+    /* Xác nhận ID */
+    const result = await User.findAll({
+      where: {
+        userID: userID,
+      }
+    });
+
+    if(0 == result.length){ 
+      res.status(404).json({ message: "Not found!"});
     }
-    else {
-      res.status(200).json({username:user.username});
+    else if(result.length > 1){
+      res.status(500).json({ error: "Server error"});
+    }
+    else { 
+      //Đăng nhập thành công
+      res.status(200).json({
+        username: result[0].toJSON().fullName,
+      });
     }
   }
   catch(error){
-    console.error("Error in findByUserID:", error);
-    res.status(500).send('server error');
+    console.error("Error: ", error);
+    res.status(500).json({ error: "Server error"});
   }
 }
 
 module.exports = {
-  authenticate,
-  authenticateRFID,
+  MB_authenticate,
+  PC_authenticate,
 }
 

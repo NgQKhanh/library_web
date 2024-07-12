@@ -5,10 +5,10 @@ const login = require('../controllers/appLoginController');
 const userApp = require('../controllers/appController');
 
 /* Người dùng đăng nhập app */
-router.post('/login',login.authenticate);   
+router.post('/login',login.MB_authenticate);   
 
 /* Đăng nhập self-service */
-router.post('/RFIDlogin',login.authenticateRFID);
+router.post('/RFIDlogin',login.PC_authenticate);
 
 /* Tìm tên sách */ 
 router.get('/bookName',userApp.getBookName);
@@ -33,6 +33,6 @@ router.post('/confirmBorrow', userApp.confirmBorrow);
 router.post('/confirmReturn', userApp.confirmReturn);
 
 /* Đặt sách */
-router.get('/reserveBook', userApp.reserveBook);
+router.get('/reserveBook', userApp.bookReservation);
 
 module.exports = router;

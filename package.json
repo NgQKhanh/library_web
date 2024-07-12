@@ -28,6 +28,7 @@
     "path": "^0.12.7",
     "sequelize": "^6.37.3",
     "socket.io": "^4.7.2",
+    "sqlite3": "^5.1.7",
     "ws": "^8.14.2"
   },
   "devDependencies": {

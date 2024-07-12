@@ -3,6 +3,7 @@ const app = express();
 const dotenv = require('dotenv').config({path: __dirname + '/config.env'});
 const PORT = process.env.PORT || 3000;
 const path = require('path');
+const database = require('./config/database');
 const webRoutes = require('./routes/web');
 const appRoutes = require('./routes/app');
 const bodyParser = require('body-parser');
@@ -26,6 +27,8 @@ app.use(session({
 socketIOManager.socketRFID(app,io);
 socketIOManager.socketIPS(app,io);
 socketIOManager.sendLocation(app, io);
+
+database.checkConnection();
 
 app.use('/',webRoutes);
 app.use('/app',appRoutes);

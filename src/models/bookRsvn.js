@@ -1,19 +1,20 @@
 
-const { Model } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+const { Model, DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   class BookReservation extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
       BookReservation.belongsTo(models.User, { foreignKey: 'userID' });
       BookReservation.belongsTo(models.Book, { foreignKey: 'bookID' });
     }
   }
   BookReservation.init({
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false
+    },
     userID: {
       type: DataTypes.STRING(20),
       allowNull: true,
@@ -23,8 +24,9 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
     },
     reserved_at: {
-      type: DataTypes.TIMESTAMP,
+      type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
+      allowNull: true,
     },
     bookID: {
       type: DataTypes.STRING(20),

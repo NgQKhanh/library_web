@@ -243,11 +243,8 @@ async function user_ReservationDelete(userID, date, shift){
 async function user_BorrowedBookList (userID)
 {
   try{
-    //Thời hạn mượn
-    let dueDays = process.env.DUE_DAYS;
-
     const [rows] = await sql.execute(
-      "SELECT loan.borrowDate, DATE_ADD(loan.borrowDate, INTERVAL ? DAY) AS dueDate, book.bookName "+
+      "SELECT loan.borrowDate, loan.dueDate, book.bookName "+
       "FROM `loan` "+ 
       "JOIN `book_copy` ON loan.bookID = book_copy.bookID " +
       "JOIN `book` ON book_copy.id = book.id " +
